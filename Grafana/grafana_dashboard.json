@@ -94,7 +94,7 @@
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) / 1000 AS \"total_wh\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
+          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) / 1000 AS \"Leistungsaufnahme in kWh\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
           "rawQuery": true,
           "refId": "Verbrauch in kWh",
           "resultFormat": "table",
@@ -113,6 +113,17 @@
             ]
           ],
           "tags": []
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "cdfs9pqhk63nke"
+          },
+          "hide": false,
+          "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) /1000) * 0.3577 AS \"Kosten in €\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear) ",
+          "rawQuery": true,
+          "refId": "Kosten",
+          "resultFormat": "table"
         }
       ],
       "title": "Gesamtverbrauch in kWh",
@@ -318,13 +329,13 @@
     "list": []
   },
   "time": {
-    "from": "now-5y",
+    "from": "now-1h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
   "title": "Raspberry Pi",
   "uid": "edfsarx2v4cn4b",
-  "version": 9,
+  "version": 13,
   "weekStart": ""
 }

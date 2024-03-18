@@ -2,12 +2,12 @@
 
 ## 
 ```mermaid
-graph LR
-    Shelly 1 --> Mosquitto
-    Shelly 2 --> Mosquitto
-    Shelly n --> Mosquitto
-    Mosquitto --> Telegraf
-    Telegraf --> InfluxDB
-    InfluxDB --> Grafana
-    InfluxDB --> Chronograf
+graph LR    
+	Shelly1(Shelly 1) --> Mosquitto
+	Shelly2(Shelly 2) --> Mosquitto
+	ShellyN(Shelly N) --> Mosquitto
+	Mosquitto --> Telegraf
+	Telegraf --> InfluxDB
+	InfluxDB --> Grafana
+	InfluxDB --> Chronograf
 ```

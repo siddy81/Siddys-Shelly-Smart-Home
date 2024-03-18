@@ -30,19 +30,22 @@
         "defaults": {
           "mappings": [],
           "thresholds": {
-            "mode": "absolute",
+            "mode": "percentage",
             "steps": [
               {
                 "color": "green",
                 "value": null
               },
               {
+                "color": "orange",
+                "value": 70
+              },
+              {
                 "color": "red",
-                "value": 80
+                "value": 85
               }
             ]
-          },
-          "unit": "short"
+          }
         },
         "overrides": []
       },
@@ -52,11 +55,10 @@
         "x": 0,
         "y": 0
       },
-      "id": 3,
+      "id": 4,
       "options": {
-        "colorMode": "background",
-        "graphMode": "none",
-        "justifyMode": "auto",
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
         "reduceOptions": {
           "calcs": [
@@ -65,13 +67,14 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": false,
-        "textMode": "auto",
-        "wideLayout": true
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto"
       },
       "pluginVersion": "10.4.0",
       "targets": [
         {
+          "alias": "Voltage",
           "datasource": {
             "type": "influxdb",
             "uid": "cdfs9pqhk63nke"
@@ -90,19 +93,16 @@
               "type": "fill"
             }
           ],
-          "hide": false,
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) / 1000 AS \"Leistungsaufnahme in kWh\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
-          "rawQuery": true,
-          "refId": "Verbrauch in kWh",
-          "resultFormat": "table",
+          "refId": "Voltage",
+          "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "apower"
+                  "voltage"
                 ],
                 "type": "field"
               },
@@ -115,19 +115,49 @@
           "tags": []
         },
         {
+          "alias": "Current",
           "datasource": {
             "type": "influxdb",
             "uid": "cdfs9pqhk63nke"
           },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
           "hide": false,
-          "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) /1000) * 0.3577 AS \"Kosten in €\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear) ",
-          "rawQuery": true,
-          "refId": "Kosten",
-          "resultFormat": "table"
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "Current",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "current"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         }
       ],
-      "title": "Gesamtverbrauch in kWh",
-      "type": "stat"
+      "type": "gauge"
     },
     {
       "datasource": {
@@ -229,6 +259,114 @@
         "type": "influxdb",
         "uid": "cdfs9pqhk63nke"
       },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "10.4.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "cdfs9pqhk63nke"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) AS \"Leistungsaufnahme in kWh\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
+          "rawQuery": true,
+          "refId": "Verbrauch in kWh",
+          "resultFormat": "table",
+          "select": [
+            [
+              {
+                "params": [
+                  "apower"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "cdfs9pqhk63nke"
+          },
+          "hide": false,
+          "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) ) * 0.3577 AS \"Kosten in €\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear) ",
+          "rawQuery": true,
+          "refId": "Kosten",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Gesamtverbrauch in kWh",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "cdfs9pqhk63nke"
+      },
       "description": "",
       "fieldConfig": {
         "defaults": {
@@ -256,7 +394,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 8
+        "y": 16
       },
       "id": 1,
       "options": {
@@ -329,13 +467,13 @@
     "list": []
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Raspberry Pi",
+  "title": "Schreibtisch",
   "uid": "edfsarx2v4cn4b",
-  "version": 13,
+  "version": 18,
   "weekStart": ""
 }

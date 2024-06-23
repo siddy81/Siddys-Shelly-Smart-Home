@@ -116,6 +116,35 @@
         name: grafana
         state: present
 
+    - name: Configure Grafana
+      copy:
+        dest: /etc/grafana/grafana.ini
+        content: |
+          #################################### Paths ####################################
+          [paths]
+          data = /var/lib/grafana
+          logs = /var/log/grafana
+          plugins = /var/lib/grafana/plugins
+
+          #################################### Server ####################################
+          [server]
+          protocol = http
+          http_port = 3000
+          domain = localhost
+          enforce_domain = false
+          root_url = %(protocol)s://%(domain)s:%(http_port)s/
+
+          #################################### Database ####################################
+          [database]
+          type = sqlite3
+          path = grafana.db
+
+          #################################### Auth ######################
+          [auth.anonymous]
+          enabled = false
+          org_name = My castle
+          org_role = Viewer
+
     - name: Start and enable Grafana service
       systemd:
         name: grafana-server
@@ -172,10 +201,6 @@
             username = "shelly"
             password = "pw123456"
             data_format = "json"
-          
-          [[outputs.influxdb]]
-            urls = ["http://raspberrypi:8086"]
-            database = "shelly"
           
           [[outputs.influxdb]]
             urls = ["http://raspberrypi:8086"]

@@ -100,6 +100,14 @@
         name: mosquitto
         state: present
 
+    - name: Create and set permissions for /run/mosquitto
+      file:
+        path: /run/mosquitto
+        state: directory
+        owner: mosquitto
+        group: mosquitto
+        mode: '0750'
+
     - name: Configure Mosquitto
       copy:
         dest: /etc/mosquitto/mosquitto.conf

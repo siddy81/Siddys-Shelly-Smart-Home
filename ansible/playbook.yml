@@ -7,6 +7,72 @@
         update_cache: yes
         upgrade: dist
 
+    - name: Remove Mosquitto
+      apt:
+        name: mosquitto
+        state: absent
+        purge: yes
+
+    - name: Remove InfluxDB, Telegraf, and Chronograf
+      apt:
+        name:
+          - influxdb
+          - telegraf
+          - chronograf
+        state: absent
+        purge: yes
+
+    - name: Remove Grafana
+      apt:
+        name: grafana
+        state: absent
+        purge: yes
+
+    - name: Clean up Mosquitto directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/mosquitto
+        - /var/lib/mosquitto
+        - /var/log/mosquitto
+
+    - name: Clean up InfluxDB directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/influxdb
+        - /var/lib/influxdb
+        - /var/log/influxdb
+
+    - name: Clean up Telegraf directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/telegraf
+        - /var/lib/telegraf
+        - /var/log/telegraf
+
+    - name: Clean up Chronograf directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/chronograf
+        - /var/lib/chronograf
+        - /var/log/chronograf
+
+    - name: Clean up Grafana directories
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /etc/grafana
+        - /var/lib/grafana
+        - /var/log/grafana
+
     - name: Install dependencies
       apt:
         name:

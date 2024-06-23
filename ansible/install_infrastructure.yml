@@ -7,6 +7,19 @@
         update_cache: yes
         upgrade: dist
 
+    - name: Add Mosquitto repository key
+      apt_key:
+        url: https://repo.mosquitto.org/debian/mosquitto-repo.gpg.key
+        state: present
+
+    - name: Add Mosquitto repository
+      apt_repository:
+        repo: "deb http://repo.mosquitto.org/debian buster main"
+        state: present
+        filename: "mosquitto"
+        update_cache: yes
+      register: mosquitto_repo_added
+
     - name: Remove Mosquitto
       apt:
         name: mosquitto
@@ -82,11 +95,6 @@
           - software-properties-common
         state: present
 
-    - name: Add Mosquitto repository
-      apt_repository:
-        repo: ppa:mosquitto-dev/mosquitto-ppa
-        state: present
-
     - name: Install Mosquitto
       apt:
         name: mosquitto
@@ -137,12 +145,12 @@
         state: restarted
         enabled: yes
 
-    - name: Add InfluxData repository
+    - name: Add InfluxData repository key
       apt_key:
         url: https://repos.influxdata.com/influxdb.key
         state: present
 
-    - name: Add InfluxData repository (continued)
+    - name: Add InfluxData repository
       apt_repository:
         repo: deb https://repos.influxdata.com/debian buster stable
         state: present
@@ -167,7 +175,7 @@
         enabled: yes
         state: started
 
-    - name: Install Grafana repository
+    - name: Install Grafana repository key
       apt_key:
         url: https://packages.grafana.com/gpg.key
         state: present

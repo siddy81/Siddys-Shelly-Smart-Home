@@ -1,0 +1,150 @@
+---
+- hosts: raspberrypi
+  become: yes
+  tasks:
+    - name: Update and upgrade apt packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Install dependencies
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+        state: present
+
+    - name: Add Mosquitto repository
+      apt_repository:
+        repo: ppa:mosquitto-dev/mosquitto-ppa
+        state: present
+
+    - name: Install Mosquitto
+      apt:
+        name: mosquitto
+        state: present
+
+    - name: Configure Mosquitto
+      copy:
+        dest: /etc/mosquitto/mosquitto.conf
+        content: |
+          pid_file /run/mosquitto/mosquitto.pid
+          
+          persistence true
+          persistence_location /var/lib/mosquitto/
+          
+          log_dest file /home/siddy/mqtt/logfile.log
+          log_type all
+          log_timestamp true
+          log_timestamp_format %Y-%m-%dT%H:%M:%S
+          
+          include_dir /etc/mosquitto/conf.d
+          
+          password_file /etc/mosquitto/pw.passwd
+          allow_anonymous false
+          
+          listener 1883
+          
+          max_connections -1
+
+    - name: Create log directory for Mosquitto
+      file:
+        path: /home/siddy/mqtt/logfile.log
+        state: touch
+        owner: mosquitto
+        group: mosquitto
+        mode: '0644'
+
+    - name: Ensure /etc/mosquitto/conf.d directory exists
+      file:
+        path: /etc/mosquitto/conf.d
+        state: directory
+        owner: mosquitto
+        group: mosquitto
+        mode: '0755'
+
+    - name: Restart Mosquitto service
+      systemd:
+        name: mosquitto
+        state: restarted
+        enabled: yes
+
+    - name: Add InfluxData repository
+      apt_key:
+        url: https://repos.influxdata.com/influxdb.key
+        state: present
+
+    - name: Add InfluxData repository (continued)
+      apt_repository:
+        repo: deb https://repos.influxdata.com/debian buster stable
+        state: present
+
+    - name: Install InfluxDB, Telegraf, and Chronograf
+      apt:
+        name:
+          - influxdb
+          - telegraf
+          - chronograf
+        state: present
+
+    - name: Start and enable InfluxDB service
+      systemd:
+        name: influxdb
+        enabled: yes
+        state: started
+
+    - name: Start and enable Telegraf service
+      systemd:
+        name: telegraf
+        enabled: yes
+        state: started
+
+    - name: Install Grafana repository
+      apt_key:
+        url: https://packages.grafana.com/gpg.key
+        state: present
+
+    - name: Add Grafana repository
+      apt_repository:
+        repo: deb https://packages.grafana.com/oss/deb stable main
+        state: present
+
+    - name: Install Grafana
+      apt:
+        name: grafana
+        state: present
+
+    - name: Start and enable Grafana service
+      systemd:
+        name: grafana-server
+        enabled: yes
+        state: started
+
+    - name: Configure Telegraf for Mosquitto and InfluxDB
+      copy:
+        dest: /etc/telegraf/telegraf.conf
+        content: |
+          [[outputs.influxdb]]
+            urls = ["http://localhost:8086"]
+            database = "telegraf"
+          
+          [[inputs.mqtt_consumer]]
+            servers = ["tcp://localhost:1883"]
+            topics = [
+              "shelly1/+/status",
+              "shelly2/+/status",
+              "shellyN/+/status"
+            ]
+            data_format = "json"
+
+    - name: Restart Telegraf service
+      systemd:
+        name: telegraf
+        state: restarted
+
+    - name: Create InfluxDB database
+      influxdb_database:
+        name: telegraf
+        state: present

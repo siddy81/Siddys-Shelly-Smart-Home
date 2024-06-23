@@ -126,18 +126,60 @@
       copy:
         dest: /etc/telegraf/telegraf.conf
         content: |
-          [[outputs.influxdb]]
-            urls = ["http://localhost:8086"]
-            database = "telegraf"
+          [global_tags]
+          
+          [agent]
+            interval = "10s"
+            round_interval = true
+            metric_batch_size = 1000
+            metric_buffer_limit = 10000
+            collection_jitter = "0s"
+            flush_interval = "10s"
+            flush_jitter = "0s"
+            precision = "0s"
+            hostname = ""
+            omit_hostname = false
+            
+          [[inputs.cpu]]
+            percpu = true
+            totalcpu = true
+            collect_cpu_time = false
+            report_active = false
+            core_tags = false
+            
+          [[inputs.disk]]
+            ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+            
+          [[inputs.diskio]]
+          
+          [[inputs.kernel]]
+          
+          [[inputs.mem]]
+          
+          [[inputs.processes]]
+          
+          [[inputs.swap]]
+          
+          [[inputs.system]]
           
           [[inputs.mqtt_consumer]]
-            servers = ["tcp://localhost:1883"]
+            servers = ["tcp://raspberrypi:1883"]
             topics = [
-              "shelly1/+/status",
-              "shelly2/+/status",
-              "shellyN/+/status"
+              "shelly_lamp_1/#",
+              "shelly_lamp_2/#",
+              "shelly_dave_desk/#"
             ]
+            username = "shelly"
+            password = "pw123456"
             data_format = "json"
+          
+          [[outputs.influxdb]]
+            urls = ["http://raspberrypi:8086"]
+            database = "shelly"
+          
+          [[outputs.influxdb]]
+            urls = ["http://raspberrypi:8086"]
+            database = "shelly"
 
     - name: Restart Telegraf service
       systemd:
@@ -146,5 +188,5 @@
 
     - name: Create InfluxDB database
       influxdb_database:
-        name: telegraf
+        name: shelly
         state: present

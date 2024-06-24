@@ -190,15 +190,18 @@
         var: mosquitto_journal.stdout
       when: mosquitto_restart_result.failed
 
-    - name: Add InfluxData repository key
-      apt_key:
-        url: https://repos.influxdata.com/influxdb.key
-        state: present
+    - name: Clean apt cache
+      command: apt-get clean
+      become: true
 
-    - name: Add InfluxData repository
-      apt_repository:
-        repo: deb https://repos.influxdata.com/debian buster stable
-        state: present
+    - name: Remove problematic package if exists
+      command: dpkg --remove --force-remove-reinstreq influxdb
+      become: true
+      ignore_errors: yes
+
+    - name: Update apt cache
+      apt:
+        update_cache: yes
 
     - name: Install InfluxDB, Telegraf, and Chronograf
       apt:

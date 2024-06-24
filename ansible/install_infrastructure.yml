@@ -3,7 +3,8 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
-    mosquitto_password: "dein_passwort_hier"  # Definiere hier das Passwort
+    mosquitto_user: "shelly"
+    mosquitto_password: "pw123456"
 
   tasks:
     - name: Update and upgrade apt packages
@@ -130,7 +131,7 @@
           max_connections -1
 
     - name: Create Mosquitto password file
-      command: mosquitto_passwd -b -c /etc/mosquitto/pw.passwd mosquitto {{ mosquitto_password }}
+      command: mosquitto_passwd -b -c /etc/mosquitto/pw.passwd {{ mosquitto_user }} {{ mosquitto_password }}
       args:
         creates: /etc/mosquitto/pw.passwd
 
@@ -322,8 +323,8 @@
               "shelly_lamp_2/#",
               "shelly_dave_desk/#"
             ]
-            username = "shelly"
-            password = "pw123456"
+            username = "{{ mosquitto_user }}"
+            password = "{{ mosquitto_password }}"
             data_format = "json"
           
           [[outputs.influxdb]]

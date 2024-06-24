@@ -3,6 +3,8 @@
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
+    mosquitto_password: "dein_passwort_hier"  # Definiere hier das Passwort
+
   tasks:
     - name: Update and upgrade apt packages
       apt:
@@ -126,6 +128,18 @@
           allow_anonymous false
           listener 1883
           max_connections -1
+
+    - name: Create Mosquitto password file
+      command: mosquitto_passwd -b -c /etc/mosquitto/pw.passwd mosquitto {{ mosquitto_password }}
+      args:
+        creates: /etc/mosquitto/pw.passwd
+
+    - name: Set permissions for Mosquitto password file
+      file:
+        path: /etc/mosquitto/pw.passwd
+        owner: mosquitto
+        group: mosquitto
+        mode: '0600'
 
     - name: Create log directory for Mosquitto
       file:

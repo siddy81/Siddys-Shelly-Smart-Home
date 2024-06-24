@@ -1,6 +1,8 @@
 ---
 - hosts: raspberrypi
   become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
   tasks:
     - name: Update and upgrade apt packages
       apt:
@@ -113,22 +115,16 @@
         dest: /etc/mosquitto/mosquitto.conf
         content: |
           pid_file /run/mosquitto/mosquitto.pid
-          
           persistence true
           persistence_location /var/lib/mosquitto/
-          
           log_dest file /home/siddy/mqtt/logfile.log
           log_type all
           log_timestamp true
           log_timestamp_format %Y-%m-%dT%H:%M:%S
-          
           include_dir /etc/mosquitto/conf.d
-          
           password_file /etc/mosquitto/pw.passwd
           allow_anonymous false
-          
           listener 1883
-          
           max_connections -1
 
     - name: Create log directory for Mosquitto
@@ -148,10 +144,36 @@
         mode: '0755'
 
     - name: Restart Mosquitto service
+      become: true
+      become_method: sudo
       systemd:
         name: mosquitto
         state: restarted
         enabled: yes
+      register: mosquitto_restart_result
+      failed_when: mosquitto_restart_result.failed
+
+    - name: Check Mosquitto service status
+      command: systemctl status mosquitto.service
+      register: mosquitto_status
+      failed_when: false
+      when: mosquitto_restart_result.failed
+
+    - name: Print Mosquitto service status
+      debug:
+        var: mosquitto_status.stdout
+      when: mosquitto_restart_result.failed
+
+    - name: Check journal for Mosquitto errors
+      command: journalctl -xe
+      register: mosquitto_journal
+      failed_when: false
+      when: mosquitto_restart_result.failed
+
+    - name: Print journal errors
+      debug:
+        var: mosquitto_journal.stdout
+      when: mosquitto_restart_result.failed
 
     - name: Add InfluxData repository key
       apt_key:
@@ -172,12 +194,16 @@
         state: present
 
     - name: Start and enable InfluxDB service
+      become: true
+      become_method: sudo
       systemd:
         name: influxdb
         enabled: yes
         state: started
 
     - name: Start and enable Telegraf service
+      become: true
+      become_method: sudo
       systemd:
         name: telegraf
         enabled: yes
@@ -228,6 +254,8 @@
           org_role = Viewer
 
     - name: Start and enable Grafana service
+      become: true
+      become_method: sudo
       systemd:
         name: grafana-server
         enabled: yes
@@ -289,6 +317,8 @@
             database = "shelly"
 
     - name: Restart Telegraf service
+      become: true
+      become_method: sudo
       systemd:
         name: telegraf
         state: restarted

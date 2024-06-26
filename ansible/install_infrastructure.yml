@@ -214,6 +214,18 @@
           - chronograf
         state: present
 
+    - name: Ensure InfluxDB directories exist
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: influxdb
+        group: influxdb
+        mode: '0755'
+      loop:
+        - /var/lib/influxdb/meta
+        - /var/lib/influxdb/data
+        - /var/lib/influxdb/wal
+
     - name: Start and enable InfluxDB service
       become: true
       become_method: sudo
@@ -221,6 +233,11 @@
         name: influxdb
         enabled: yes
         state: started
+
+    - name: Install Python influxdb module
+      pip:
+        name: influxdb
+        state: present
 
     - name: Configure Telegraf
       copy:
@@ -362,5 +379,13 @@
 
     - name: Create InfluxDB database
       influxdb_database:
-        name: shelly
+        database_name: shelly
         state: present
+
+    - name: Start and enable Chronograf service
+      become: true
+      become_method: sudo
+      systemd:
+        name: chronograf
+        enabled: yes
+        state: started

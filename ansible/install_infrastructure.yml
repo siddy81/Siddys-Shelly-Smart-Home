@@ -226,6 +226,30 @@
         name: telegraf
         enabled: yes
         state: started
+      register: telegraf_restart_result
+      failed_when: telegraf_restart_result.failed
+
+    - name: Check Telegraf service status
+      command: systemctl status telegraf.service
+      register: telegraf_status
+      failed_when: false
+      when: telegraf_restart_result.failed
+
+    - name: Print Telegraf service status
+      debug:
+        var: telegraf_status.stdout
+      when: telegraf_restart_result.failed
+
+    - name: Check journal for Telegraf errors
+      command: journalctl -xe
+      register: telegraf_journal
+      failed_when: false
+      when: telegraf_restart_result.failed
+
+    - name: Print journal errors
+      debug:
+        var: telegraf_journal.stdout
+      when: telegraf_restart_result.failed
 
     - name: Install Grafana repository key
       apt_key:

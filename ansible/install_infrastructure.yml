@@ -191,12 +191,15 @@
       when: mosquitto_restart_result.failed
 
     - name: Clean apt cache
-      command: apt-get clean
-      become: true
+      apt:
+        update_cache: yes
+        autoclean: yes
 
     - name: Remove problematic package if exists
-      command: dpkg --remove --force-remove-reinstreq influxdb
-      become: true
+      apt:
+        name: influxdb
+        state: absent
+        purge: yes
       ignore_errors: yes
 
     - name: Update apt cache
@@ -218,6 +221,60 @@
         name: influxdb
         enabled: yes
         state: started
+
+    - name: Configure Telegraf
+      copy:
+        dest: /etc/telegraf/telegraf.conf
+        content: |
+          [global_tags]
+          [agent]
+            interval = "10s"
+            round_interval = true
+            metric_batch_size = 1000
+            metric_buffer_limit = 10000
+            collection_jitter = "0s"
+            flush_interval = "10s"
+            flush_jitter = "0s"
+            precision = "0s"
+            hostname = ""
+            omit_hostname = false
+            
+          [[inputs.cpu]]
+            percpu = true
+            totalcpu = true
+            collect_cpu_time = false
+            report_active = false
+            core_tags = false
+            
+          [[inputs.disk]]
+            ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
+            
+          [[inputs.diskio]]
+          
+          [[inputs.kernel]]
+          
+          [[inputs.mem]]
+          
+          [[inputs.processes]]
+          
+          [[inputs.swap]]
+          
+          [[inputs.system]]
+          
+          [[inputs.mqtt_consumer]]
+            servers = ["tcp://raspberrypi:1883"]
+            topics = [
+              "shelly_lamp_1/#",
+              "shelly_lamp_2/#",
+              "shelly_dave_desk/#"
+            ]
+            username = "{{ mosquitto_user }}"
+            password = "{{ mosquitto_password }}"
+            data_format = "json"
+          
+          [[outputs.influxdb]]
+            urls = ["http://raspberrypi:8086"]
+            database = "shelly"
 
     - name: Start and enable Telegraf service
       become: true
@@ -302,68 +359,6 @@
         name: grafana-server
         enabled: yes
         state: started
-
-    - name: Configure Telegraf for Mosquitto and InfluxDB
-      copy:
-        dest: /etc/telegraf/telegraf.conf
-        content: |
-          [global_tags]
-          
-          [agent]
-            interval = "10s"
-            round_interval = true
-            metric_batch_size = 1000
-            metric_buffer_limit = 10000
-            collection_jitter = "0s"
-            flush_interval = "10s"
-            flush_jitter = "0s"
-            precision = "0s"
-            hostname = ""
-            omit_hostname = false
-            
-          [[inputs.cpu]]
-            percpu = true
-            totalcpu = true
-            collect_cpu_time = false
-            report_active = false
-            core_tags = false
-            
-          [[inputs.disk]]
-            ignore_fs = ["tmpfs", "devtmpfs", "devfs", "iso9660", "overlay", "aufs", "squashfs"]
-            
-          [[inputs.diskio]]
-          
-          [[inputs.kernel]]
-          
-          [[inputs.mem]]
-          
-          [[inputs.processes]]
-          
-          [[inputs.swap]]
-          
-          [[inputs.system]]
-          
-          [[inputs.mqtt_consumer]]
-            servers = ["tcp://raspberrypi:1883"]
-            topics = [
-              "shelly_lamp_1/#",
-              "shelly_lamp_2/#",
-              "shelly_dave_desk/#"
-            ]
-            username = "{{ mosquitto_user }}"
-            password = "{{ mosquitto_password }}"
-            data_format = "json"
-          
-          [[outputs.influxdb]]
-            urls = ["http://raspberrypi:8086"]
-            database = "shelly"
-
-    - name: Restart Telegraf service
-      become: true
-      become_method: sudo
-      systemd:
-        name: telegraf
-        state: restarted
 
     - name: Create InfluxDB database
       influxdb_database:

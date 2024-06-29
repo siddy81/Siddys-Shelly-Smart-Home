@@ -378,6 +378,18 @@
           [security]
           admin_user = {{ grafana_admin_user }}
           admin_password = {{ grafana_admin_password }}
+          
+          #################################### Datasources ######################
+          [datasources]
+          [[datasources.influxdb]]
+          name = "{{ influxdb_database_name }}"
+          type = "{{ influxdb_database_name }}"
+          access = "proxy"
+          url = "{{ influxdb_url }}"
+          database = "{{ influxdb_database_name }}"
+          user = ""
+          password = ""
+          isDefault = true
 
     - name: Start and enable Grafana service
       become: true
@@ -416,29 +428,6 @@
         enabled: yes
         state: started
 
-    - name: Configure Grafana datasource for InfluxDB
-      uri:
-        url: "http://localhost:3000/api/datasources"
-        method: POST
-        headers:
-          Content-Type: "application/json"
-        body_format: json
-        body:
-          name: "InfluxDB"
-          type: "influxdb"
-          access: "proxy"
-          url: "{{ influxdb_url }}"
-          database: "{{ influxdb_database_name }}"
-          user: ""
-          password: ""
-          isDefault: true
-        status_code: 200, 409
-      register: grafana_datasource
-      until: grafana_datasource.status == 200
-      retries: 5
-      delay: 10
-      become: true
-      become_user: grafana
 
     - name: Restart all services
       systemd:

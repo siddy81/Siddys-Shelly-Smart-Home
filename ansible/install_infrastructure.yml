@@ -379,6 +379,7 @@
           [security]
           admin_user = {{ grafana_admin_user }}
           admin_password = {{ grafana_admin_password }}
+
           
           #################################### Datasources ######################
           [datasources]
@@ -392,6 +393,7 @@
           password = ""
           isDefault = true
           
+
     - name: Start and enable Grafana service
       become: true
       become_method: sudo
@@ -399,6 +401,11 @@
         name: grafana-server
         enabled: yes
         state: started
+
+    - name: Create InfluxDB database
+      influxdb_database:
+        database_name: "{{ influxdb_database_name }}"
+        state: present
         
     - name: Ensure Chronograf directory exists
       file:
@@ -407,11 +414,6 @@
         owner: chronograf
         group: chronograf
         mode: '0755'
-
-    - name: Create InfluxDB database
-      influxdb_database:
-        database_name: "{{ influxdb_database_name }}"
-        state: present
 
     - name: Configure Chronograf
       copy:

@@ -18,14 +18,14 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 1,
+  "id": 3,
   "links": [],
   "liveNow": true,
   "panels": [
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "shelly_mqqt_db"
+        "uid": "adq90e39l4lq8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -46,8 +46,8 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 4,
+        "w": 4,
         "x": 0,
         "y": 0
       },
@@ -57,6 +57,7 @@
         "graphMode": "area",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -68,12 +69,12 @@
         "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "groupBy": [
             {
@@ -111,15 +112,14 @@
           "tags": []
         }
       ],
-      "title": "Availaible Disk Space",
+      "title": "Available Disk Space",
       "type": "stat"
     },
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "cdfs9pqhk63nke"
+        "uid": "adq90e39l4lq8e"
       },
-      "description": "",
       "fieldConfig": {
         "defaults": {
           "mappings": [],
@@ -136,22 +136,25 @@
               }
             ]
           },
-          "unit": "short"
+          "unit": "bytes"
         },
         "overrides": []
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 12,
+        "h": 4,
+        "w": 4,
+        "x": 4,
         "y": 0
       },
-      "id": 1,
+      "id": 7,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
         "justifyMode": "auto",
+        "minVizHeight": 75,
+        "minVizWidth": 75,
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -159,48 +162,38 @@
           "fields": "",
           "values": false
         },
-        "showPercentChange": true,
-        "textMode": "auto",
+        "showPercentChange": false,
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "textMode": "value",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "groupBy": [
             {
               "params": [
-                "1s"
+                "$__interval"
               ],
               "type": "time"
-            },
-            {
-              "params": [
-                "topic::tag"
-              ],
-              "type": "tag"
-            },
-            {
-              "params": [
-                "linear"
-              ],
-              "type": "fill"
             }
           ],
-          "hide": false,
-          "measurement": "mqtt_consumer",
+          "measurement": "mem",
           "orderByTime": "ASC",
           "policy": "default",
-          "refId": "Watt",
+          "refId": "Memory",
           "resultFormat": "time_series",
           "select": [
             [
               {
                 "params": [
-                  "apower"
+                  "used"
                 ],
                 "type": "field"
               },
@@ -213,13 +206,13 @@
           "tags": []
         }
       ],
-      "title": "Watt",
-      "type": "stat"
+      "title": "Memory Usage",
+      "type": "gauge"
     },
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "cdfs9pqhk63nke"
+        "uid": "adq90e39l4lq8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -242,9 +235,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 8
+        "w": 7,
+        "x": 8,
+        "y": 0
       },
       "id": 4,
       "options": {
@@ -262,13 +255,13 @@
         "showThresholdMarkers": true,
         "sizing": "auto"
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "alias": "Voltage",
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "groupBy": [
             {
@@ -293,7 +286,7 @@
           "hide": false,
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
-          "policy": "default",
+          "policy": "autogen",
           "refId": "Voltage",
           "resultFormat": "time_series",
           "select": [
@@ -316,7 +309,7 @@
           "alias": "Current",
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "groupBy": [
             {
@@ -341,7 +334,7 @@
           "hide": false,
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
-          "policy": "default",
+          "policy": "autogen",
           "query": "SELECT mean(\"current\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval), \"topic\"::tag fill(null)",
           "rawQuery": false,
           "refId": "Current",
@@ -366,7 +359,7 @@
           "alias": "°C",
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "hide": false,
           "query": "SELECT mean(\"temperature_tC\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval), \"topic\"::tag fill(linear)",
@@ -380,7 +373,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "cdfs9pqhk63nke"
+        "uid": "adq90e39l4lq8e"
       },
       "fieldConfig": {
         "defaults": {
@@ -404,9 +397,9 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 16
+        "w": 5,
+        "x": 15,
+        "y": 0
       },
       "id": 3,
       "options": {
@@ -414,6 +407,7 @@
         "graphMode": "none",
         "justifyMode": "auto",
         "orientation": "auto",
+        "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
             "lastNotNull"
@@ -425,12 +419,12 @@
         "textMode": "auto",
         "wideLayout": true
       },
-      "pluginVersion": "10.4.0",
+      "pluginVersion": "11.1.0",
       "targets": [
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "groupBy": [
             {
@@ -450,7 +444,7 @@
           "measurement": "mqtt_consumer",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) AS \"Leistungsaufnahme in kWh\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
+          "query": "SELECT sum(\"apower\") * (COUNT(\"apower\") / 3600) AS \"Leistungsaufnahme in kWh\" FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
           "rawQuery": true,
           "refId": "Verbrauch in kWh",
           "resultFormat": "table",
@@ -473,10 +467,10 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "hide": false,
-          "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) ) * 0.3577 AS \"Kosten in €\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear) ",
+          "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) ) * 0.3577 AS \"Kosten in €\" FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear)",
           "rawQuery": true,
           "refId": "Kosten",
           "resultFormat": "table"
@@ -484,10 +478,10 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "cdfs9pqhk63nke"
+            "uid": "adq90e39l4lq8e"
           },
           "hide": false,
-          "query": "SELECT integral(\"apower\", 1h)  AS \"Leistungsaufnahme in kWh\"\nFROM \"mqtt_consumer\"\nWHERE $timeFilter\nGROUP BY time($__interval)\n\n",
+          "query": "SELECT integral(\"apower\", 1h) AS \"Leistungsaufnahme in kWh\" FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval)",
           "rawQuery": true,
           "refId": "Leistungsaufnahme in kWh",
           "resultFormat": "time_series"
@@ -495,16 +489,635 @@
       ],
       "title": "Gesamtverbrauch in kWh",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "adq90e39l4lq8e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "id": 6,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true,
+        "sizing": "auto",
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "adq90e39l4lq8e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            }
+          ],
+          "measurement": "cpu",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "CPU",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "usage_idle"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "CPU Usage",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "adq90e39l4lq8e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 8,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "adq90e39l4lq8e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "topic::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "Current",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "current"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "distinct"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Current (A)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "adq90e39l4lq8e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 1,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "adq90e39l4lq8e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "topic::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "query": "SELECT mean(\"voltage\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY \"topic\"\n",
+          "rawQuery": false,
+          "refId": "Spannung (V)",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "voltage"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "distinct"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Spannung (v)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "adq90e39l4lq8e"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 20,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "adq90e39l4lq8e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "topic::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "linear"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "power",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "apower"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "distinct"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Power (W)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "adq90e39l4lq8e"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 15,
+        "x": 0,
+        "y": 28
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "adq90e39l4lq8e"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "mqtt_consumer",
+          "orderByTime": "ASC",
+          "policy": "autogen",
+          "refId": "Freq",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "freq"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "distinct"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Freq (Hz)",
+      "type": "timeseries"
     }
   ],
-  "refresh": "5s",
+  "refresh": "auto",
   "schemaVersion": 39,
   "tags": [],
   "templating": {
     "list": []
   },
   "time": {
-    "from": "now-5m",
+    "from": "now-15m",
     "to": "now"
   },
   "timepicker": {
@@ -513,6 +1126,6 @@
   "timezone": "browser",
   "title": "Schreibtisch",
   "uid": "edfsarx2v4cn4b",
-  "version": 37,
+  "version": 32,
   "weekStart": "monday"
 }

@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "shelly_mqqt_db"
+         "uid": "uid_shelly_mqqt_db" 
       },
       "fieldConfig": {
         "defaults": {
@@ -73,7 +73,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "groupBy": [
             {
@@ -117,7 +117,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "shelly_mqqt_db"
+         "uid": "uid_shelly_mqqt_db" 
       },
       "description": "",
       "fieldConfig": {
@@ -168,7 +168,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "groupBy": [
             {
@@ -219,7 +219,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "shelly_mqqt_db"
+         "uid": "uid_shelly_mqqt_db" 
       },
       "fieldConfig": {
         "defaults": {
@@ -268,7 +268,7 @@
           "alias": "Voltage",
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "groupBy": [
             {
@@ -316,7 +316,7 @@
           "alias": "Current",
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "groupBy": [
             {
@@ -366,7 +366,7 @@
           "alias": "°C",
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "hide": false,
           "query": "SELECT mean(\"temperature_tC\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval), \"topic\"::tag fill(linear)",
@@ -380,7 +380,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "shelly_mqqt_db"
+         "uid": "uid_shelly_mqqt_db" 
       },
       "fieldConfig": {
         "defaults": {
@@ -430,7 +430,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "groupBy": [
             {
@@ -473,7 +473,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "hide": false,
           "query": "SELECT (sum(\"apower\") * (COUNT(\"apower\") / 3600) ) * 0.3577 AS \"Kosten in €\"   FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval) fill(linear) ",
@@ -484,7 +484,7 @@
         {
           "datasource": {
             "type": "influxdb",
-            "uid": "shelly_mqqt_db"
+             "uid": "uid_shelly_mqqt_db" 
           },
           "hide": false,
           "query": "SELECT integral(\"apower\", 1h)  AS \"Leistungsaufnahme in kWh\"\nFROM \"mqtt_consumer\"\nWHERE $timeFilter\nGROUP BY time($__interval)\n\n",

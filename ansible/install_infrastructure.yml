@@ -9,6 +9,7 @@
     grafana_admin_password: "pw123456"
     influxdb_url: "http://localhost:8086"
     influxdb_database_name: "shelly_mqqt_db"
+    grafana_datasource_uid: "uid_shelly_mqqt_db"
 
   tasks:
     - name: Update and upgrade apt packages
@@ -390,7 +391,7 @@
           user = ""
           password = ""
           isDefault = true
-
+          
     - name: Start and enable Grafana service
       become: true
       become_method: sudo
@@ -398,12 +399,7 @@
         name: grafana-server
         enabled: yes
         state: started
-
-    - name: Create InfluxDB database
-      influxdb_database:
-        database_name: "{{ influxdb_database_name }}"
-        state: present
-
+        
     - name: Ensure Chronograf directory exists
       file:
         path: /etc/chronograf
@@ -411,6 +407,11 @@
         owner: chronograf
         group: chronograf
         mode: '0755'
+
+    - name: Create InfluxDB database
+      influxdb_database:
+        database_name: "{{ influxdb_database_name }}"
+        state: present
 
     - name: Configure Chronograf
       copy:
@@ -428,7 +429,6 @@
         enabled: yes
         state: started
 
-
     - name: Restart all services
       systemd:
         name: "{{ item }}"
@@ -439,3 +439,5 @@
         - telegraf
         - grafana-server
         - chronograf
+      become: true
+      become_method: sudo

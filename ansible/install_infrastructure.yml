@@ -6,8 +6,9 @@
     mosquitto_user: "shelly"
     mosquitto_password: "pw123456"
     grafana_admin_user: "admin"
-    grafana_admin_password: "admin_password"
+    grafana_admin_password: "pw123456"
     influxdb_url: "http://localhost:8086"
+    influxdb_database_name: "shelly_mqqt_db"
 
   tasks:
     - name: Update and upgrade apt packages
@@ -295,8 +296,8 @@
             data_format = "json"
           
           [[outputs.influxdb]]
-            urls = ["http://raspberrypi:8086"]
-            database = "shelly"
+            urls = ["{{ influxdb_url }}"]
+            database = "{{ influxdb_database_name }}"
 
     - name: Start and enable Telegraf service
       become: true
@@ -388,8 +389,16 @@
 
     - name: Create InfluxDB database
       influxdb_database:
-        database_name: shelly
+        database_name: "{{ influxdb_database_name }}"
         state: present
+
+    - name: Ensure Chronograf directory exists
+      file:
+        path: /etc/chronograf
+        state: directory
+        owner: chronograf
+        group: chronograf
+        mode: '0755'
 
     - name: Configure Chronograf
       copy:
@@ -397,6 +406,7 @@
         content: |
           [influxdb]
           url = "{{ influxdb_url }}"
+          database = "{{ influxdb_database_name }}"
 
     - name: Start and enable Chronograf service
       become: true

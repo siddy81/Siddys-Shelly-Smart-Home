@@ -17,6 +17,13 @@ Ensure the following components are in place before starting the setup:
 
 Start with the configuration of Mosquitto. A sample configuration file can be found in the `config/mosquitto.conf` directory. Adjust this file as needed to suit your network environment.
 
+mosquitto_sub -h localhost -t '#' -u "shelly" -P "pw123456" -v
+
+### InfluxDB
+
+influx -database 'shelly_mqqt_db' -execute 'SELECT * FROM <measurement_name> LIMIT 10'
+
+
 ### Telegraf
 
 Configure Telegraf to collect and forward data from your Shelly devices. An example Telegraf configuration can be found at `config/telegraf.conf`.

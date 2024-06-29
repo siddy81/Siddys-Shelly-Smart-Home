@@ -286,9 +286,9 @@
           [[inputs.mqtt_consumer]]
             servers = ["tcp://raspberrypi:1883"]
             topics = [
-              "shelly_lamp_1/#",
-              "shelly_lamp_2/#",
-              "shelly_dave_desk/#",
+              "shelly_lampe_1/#",
+              "shelly_lampe_2/#",
+              "shelly_dawid_schreibtisch/#",
               "shelly_spuelmaschine/#",
               "shelly_xavier_schreibtisch/#"
             ]

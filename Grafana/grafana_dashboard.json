@@ -25,7 +25,7 @@
     {
       "datasource": {
         "type": "influxdb",
-        "uid": "cdfs9pqhk63nke"
+        "uid": "shelly_mqqt_db"
       },
       "fieldConfig": {
         "defaults": {

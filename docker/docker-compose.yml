@@ -37,8 +37,21 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=adminpassword
     volumes:
       - grafana-storage:/var/lib/grafana
+      - ./grafana_dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
+      - ./grafana_provisioning:/etc/grafana/provisioning
     depends_on:
       - influxdb
+    restart: unless-stopped
+
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    network_mode: "host"
+    volumes:
+      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    depends_on:
+      - influxdb
+      - mosquitto
     restart: unless-stopped
 
 volumes:

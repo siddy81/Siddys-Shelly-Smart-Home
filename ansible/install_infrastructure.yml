@@ -1,5 +1,5 @@
 ---
-- hosts: raspberrypi
+- hosts: nimbuspi
   become: yes
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -290,7 +290,8 @@
               "shelly_lampe_2/#",
               "shelly_dawid_schreibtisch/#",
               "shelly_spuelmaschine/#",
-              "shelly_xavier_schreibtisch/#"
+              "shelly_xavier_schreibtisch/#",
+              "shelly_wohnzimmer/#"
             ]
             username = "{{ mosquitto_user }}"
             password = "{{ mosquitto_password }}"

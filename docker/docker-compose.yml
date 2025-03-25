@@ -6,11 +6,12 @@ services:
     container_name: mosquitto
     ports:
       - "1883:1883"  # MQTT Port
-      - "9001:9001"  # WebSocket Port
+      - "9001:9001"  # WebSocket Port (optional)
     volumes:
-      - ./mosquitto/config:/mosquitto/config
-      - ./mosquitto/data:/mosquitto/data
-      - ./mosquitto/log:/mosquitto/log
+      - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf  # Die lokale mosquitto.conf wird eingebunden
+      - ./mosquitto/config:/etc/mosquitto/conf.d  # Optional, falls zusätzliche Konfigurationsdateien vorhanden sind
+      - ./mosquitto/data:/var/lib/mosquitto/  # Persistente Daten
+      - ./mosquitto/log:/var/log/mosquitto/  # Logdateien
     restart: unless-stopped
 
   influxdb:
@@ -37,21 +38,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=adminpassword
     volumes:
       - grafana-storage:/var/lib/grafana
-      - ./grafana_dashboard.json:/etc/grafana/provisioning/dashboards/dashboard.json
-      - ./grafana_provisioning:/etc/grafana/provisioning
     depends_on:
       - influxdb
-    restart: unless-stopped
-
-  telegraf:
-    image: telegraf:latest
-    container_name: telegraf
-    network_mode: "host"
-    volumes:
-      - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
-    depends_on:
-      - influxdb
-      - mosquitto
     restart: unless-stopped
 
 volumes:

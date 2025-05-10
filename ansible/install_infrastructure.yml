@@ -5,11 +5,6 @@
     ansible_python_interpreter: /usr/bin/python3
     mosquitto_user: "shelly"
     mosquitto_password: "pw123456"
-    grafana_admin_user: "admin"
-    grafana_admin_password: "pw123456"
-    influxdb_url: "http://localhost:8086"
-    influxdb_database_name: "shelly_mqqt_db"
-    grafana_datasource_uid: "uid_shelly_mqqt_db"
 
   tasks:
     - name: Update and upgrade apt packages
@@ -284,22 +279,19 @@
           [[inputs.system]]
           
           [[inputs.mqtt_consumer]]
-            servers = ["tcp://raspberrypi:1883"]
+            servers = ["tcp://nimbuspi:1883"]
             topics = [
-              "shelly_lampe_1/#",
-              "shelly_lampe_2/#",
-              "shelly_dawid_schreibtisch/#",
-              "shelly_spuelmaschine/#",
-              "shelly_xavier_schreibtisch/#",
-              "shelly_wohnzimmer/#"
+              "shelly_lamp_1/#",
+              "shelly_lamp_2/#",
+              "shelly_dave_desk/#"
             ]
             username = "{{ mosquitto_user }}"
             password = "{{ mosquitto_password }}"
             data_format = "json"
           
           [[outputs.influxdb]]
-            urls = ["{{ influxdb_url }}"]
-            database = "{{ influxdb_database_name }}"
+            urls = ["http://raspberrypi:8086"]
+            database = "shelly"
 
     - name: Start and enable Telegraf service
       become: true
@@ -407,7 +399,7 @@
       influxdb_database:
         database_name: "{{ influxdb_database_name }}"
         state: present
-        
+
     - name: Ensure Chronograf directory exists
       file:
         path: /etc/chronograf

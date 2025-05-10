@@ -17,7 +17,9 @@ Ensure the following components are in place before starting the setup:
 
 Start with the configuration of Mosquitto. A sample configuration file can be found in the `config/mosquitto.conf` directory. Adjust this file as needed to suit your network environment.
 
-mosquitto_sub -h localhost -t '#' -u "shelly" -P "pw123456" -v
+docker exec -it mosquitto mosquitto_sub -h localhost -t '#' -u "shelly" -P "pw123456" -v
+docker exec -it mosquitto mosquitto_sub -h localhost -p 1883 -t "#" -v
+
 
 ### InfluxDB
 

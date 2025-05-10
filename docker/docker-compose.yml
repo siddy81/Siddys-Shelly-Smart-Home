@@ -8,14 +8,19 @@ services:
       - "1883:1883"  # MQTT Port
       - "9001:9001"  # WebSocket Port (optional)
     volumes:
-      - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf  # Die lokale mosquitto.conf wird eingebunden
-      - ./mosquitto/config:/etc/mosquitto/conf.d  # Optional, falls zusätzliche Konfigurationsdateien vorhanden sind
-      - ./mosquitto/data:/var/lib/mosquitto/  # Persistente Daten
-      - ./mosquitto/log:/var/log/mosquitto/  # Logdateien
+      - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf
+      - ./mosquitto/conf.d:/etc/mosquitto/conf.d
+      - ./mosquitto/data:/var/lib/mosquitto/
+      - ./mosquitto/log:/var/log/mosquitto/
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z localhost 1883"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   influxdb:
-    image: influxdb:latest
+    image: influxdb:1.8
     container_name: influxdb
     ports:
       - "8086:8086"
@@ -28,6 +33,18 @@ services:
       - influxdb-storage:/var/lib/influxdb
     restart: unless-stopped
 
+  telegraf:
+    image: telegraf:latest
+    container_name: telegraf
+    depends_on:
+      mosquitto:
+        condition: service_healthy
+      influxdb:
+        condition: service_started
+    volumes:
+      - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    restart: unless-stopped
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -36,8 +53,13 @@ services:
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=adminpassword
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini:ro
       - grafana-storage:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana_dashboard.json:/etc/grafana/provisioning/dashboards/grafana_dashboard.json:ro
     depends_on:
       - influxdb
     restart: unless-stopped

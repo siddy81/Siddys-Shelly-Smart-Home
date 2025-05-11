@@ -59,13 +59,7 @@ docker-compose logs -f
 To view all incoming MQTT messages (from any topic) live, use the `mosquitto_sub` CLI tool:
 
 ```bash
-mosquitto_sub \
-  -h localhost \
-  -p 1883 \
-  -u shelly \
-  -P shelly123456 \
-  -t "#" \
-  -v
+mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "#" -v
 ```
 
 Flags explanation:

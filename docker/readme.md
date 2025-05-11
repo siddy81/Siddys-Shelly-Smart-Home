@@ -60,6 +60,10 @@ To view all incoming MQTT messages (from any topic) live, use the `mosquitto_sub
 
 ```bash
 mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "#" -v
+
+#send test 
+mosquitto_pub -h localhost -p 1883 -u shelly -P shelly123456 -t "test/json" -m '{"status":"ok","value":42}'
+
 ```
 
 Flags explanation:

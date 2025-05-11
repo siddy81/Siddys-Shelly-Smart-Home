@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     openssh-server \
     nano \
     sudo \
+    less \
     mosquitto \
     mosquitto-clients && \
     apt-get clean

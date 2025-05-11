@@ -17,7 +17,8 @@ EOF
 
 # 3) Dienste starten
 service ssh start
-service mosquitto start
+#service mosquitto start
+mosquitto -d -c /etc/mosquitto/mosquitto.conf
 
 # 4) Log-Ausgabe am Leben halten
 tail -f /dev/null

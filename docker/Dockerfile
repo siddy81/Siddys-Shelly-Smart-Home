@@ -27,9 +27,6 @@ RUN apt-get update && apt-get install -y \
 
 
 
-
-
-
 # --- Enable InfluxDB Web-Admin UI (Port 8083) ---
 RUN sed -i 's/# \[admin\]/[admin]/' /etc/influxdb/influxdb.conf && \
     sed -i 's/  enabled = false/  enabled = true/' /etc/influxdb/influxdb.conf && \

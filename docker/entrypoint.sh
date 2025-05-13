@@ -33,6 +33,8 @@ service ssh start
 # --- 4) Mosquitto starten ---
 mosquitto -c /etc/mosquitto/mosquitto.conf &
 
+service telegraf start
+
 # --- 5) InfluxDB starten + DB anlegen ---
 service influxdb start
 for i in {1..30}; do

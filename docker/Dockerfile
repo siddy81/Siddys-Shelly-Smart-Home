@@ -26,12 +26,6 @@ RUN apt-get update && apt-get install -y \
     apt-get clean
 
 
-
-# --- Enable InfluxDB Web-Admin UI (Port 8083) ---
-RUN sed -i 's/# \[admin\]/[admin]/' /etc/influxdb/influxdb.conf && \
-    sed -i 's/  enabled = false/  enabled = true/' /etc/influxdb/influxdb.conf && \
-    sed -i 's/  port = 8086/  port = 8083/' /etc/influxdb/influxdb.conf
-
 # --- Prepare directories ---
 RUN mkdir -p /run/mosquitto && chown mosquitto:mosquitto /run/mosquitto
 RUN mkdir -p /var/log/telegraf && chown telegraf:telegraf /var/log/telegraf
@@ -44,6 +38,9 @@ RUN echo "$ADMIN_USER:$ADMIN_PASSWORD" | chpasswd && \
 # --- Copy configs ---
 COPY mosquitto/config/mosquitto.conf /etc/mosquitto/mosquitto.conf
 COPY telegraf/config/telegraf.conf   /etc/telegraf/telegraf.conf
+COPY influxdb/config/influxdb.conf   /etc/influxdb/influxdb.conf
+COPY influxdb/config/init-influxdb.iql /tmp/init-influxdb.iql
+
 
 EXPOSE 22 1883 8083 8086
 

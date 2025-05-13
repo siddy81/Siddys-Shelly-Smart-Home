@@ -79,3 +79,12 @@ Flags explanation:
 * `-v`: Verbose mode, shows both topic and payload
 
 All incoming messages will be printed directly to your terminal.
+
+
+
+## influx db
+
+influx -precision rfc3339
+USE shelly
+SHOW MEASUREMENTS
+SELECT * FROM "temperature" LIMIT 10

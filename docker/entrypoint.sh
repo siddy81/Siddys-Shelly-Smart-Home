@@ -36,12 +36,19 @@ mosquitto -c /etc/mosquitto/mosquitto.conf &
 service telegraf start
 
 # --- 5) InfluxDB starten + DB anlegen ---
-service influxdb start
-for i in {1..30}; do
-  influx -execute "SHOW DATABASES" >/dev/null 2>&1 && break
+# 1) InfluxDB im Hintergrund starten
+influxd -config /etc/influxdb/influxdb.conf &
+INFLUXD_PID=$!
+
+# 2) Warten, bis HTTP-API erreichbar ist
+until curl -s http://localhost:8086/ping >/dev/null; do
+  echo "Waiting for InfluxDB to come up…"
   sleep 1
 done
-influx -execute "CREATE DATABASE shelly"
+
+# 3) Init-Skript ausführen (erst einmalig, beim ersten Start)
+echo "Importing initial InfluxQL script…"
+influx -precision rfc3339 -import -path /tmp/init-influxdb.iql
 
 # --- 6) Telegraf-Config generieren ---
 if [ ! -f "$TEMPLATE_CONF" ]; then

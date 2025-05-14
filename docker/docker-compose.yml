@@ -11,3 +11,4 @@ services:
     volumes:
       - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf:ro
       - ./telegraf/config/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+      - ./influxdb/data:/var/lib/influxdb

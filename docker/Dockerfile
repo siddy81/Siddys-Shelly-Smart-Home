@@ -46,7 +46,9 @@ EXPOSE 22 1883 8083 8086
 
 WORKDIR /tmp
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
 
-CMD ["/entrypoint.sh"]
+
+# ganz unten in deinem Dockerfile
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

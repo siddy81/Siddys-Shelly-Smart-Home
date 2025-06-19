@@ -25,8 +25,18 @@ This directory contains the Docker configuration for the **Shelly Control Center
 2. On container startup the credentials are taken from the following environment variables:
     * `MOSQUITTO_USER` / `MOSQUITTO_PASSWORD` – MQTT broker login
     * `ADMIN_USER` / `ADMIN_PASSWORD` – SSH login to the container
-   * `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` – Grafana admin account
+    * `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` – Grafana admin account
    Default values are defined in the `Dockerfile` and can be overridden when starting the container.
+
+### Default Credentials
+
+The preconfigured logins are:
+
+| Service    | Username | Password      |
+|------------|---------|---------------|
+| SSH        | `root`  | `root`        |
+| Mosquitto  | `shelly`| `shelly123456`|
+| Grafana    | `admin` | `admin`       |
 
 ### Shelly Device Setup
 
@@ -52,8 +62,15 @@ docker-compose up -d --build
 ## Access
 
 * SSH: `ssh ADMIN_USER@localhost -p 2222`
-* Grafana: <http://localhost:3000>
+* Grafana: <http://localhost:3000> (login with `admin` / `admin`)
 * MQTT broker: `localhost:1883`
+
+### Grafana Dashboard
+
+Import the dashboard JSON from `grafana/shelly_dashboard.json` to get an
+overview of temperature and power consumption for your Shelly devices. In
+Grafana, navigate to **Dashboards → Import**, upload the JSON file and select the
+`InfluxDB` data source when prompted.
 
 ### Data Flow
 

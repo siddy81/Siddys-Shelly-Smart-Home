@@ -1,0 +1,59 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "gnetId": null,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": "InfluxDB",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "celsius"
+        },
+        "overrides": []
+      },
+      "gridPos": {"h":8,"w":12,"x":0,"y":0},
+      "id": 1,
+      "options": {
+        "orientation": "auto"
+      },
+      "targets": [
+        {
+          "query": "SELECT mean(\"temperature_tC\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval)",
+          "refId": "temperature"
+        }
+      ],
+      "title": "Temperatur",
+      "type": "gauge"
+    },
+    {
+      "datasource": "InfluxDB",
+      "gridPos": {"h":8,"w":12,"x":12,"y":0},
+      "id": 2,
+      "options": {},
+      "targets": [
+        {
+          "query": "SELECT mean(\"apower\") FROM \"mqtt_consumer\" WHERE $timeFilter GROUP BY time($__interval)",
+          "refId": "power"
+        }
+      ],
+      "title": "Leistungsaufnahme",
+      "type": "timeseries"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["shelly"],
+  "templating": {"list": []},
+  "time": {"from": "now-6h","to": "now"},
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Shelly Overview",
+  "uid": "shelly-overview",
+  "version": 1,
+  "weekStart": "monday"
+}

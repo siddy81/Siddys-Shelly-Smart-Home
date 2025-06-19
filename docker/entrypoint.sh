@@ -66,13 +66,12 @@ fi
 envsubst '${MOSQUITTO_USER} ${MOSQUITTO_PASSWORD}' < "$TEMPLATE_CONF" > "$GENERATED_CONF"
 
 # --- 7) Telegraf starten ---
-service telegraf start
+telegraf --config "$GENERATED_CONF" &
 
 # --- 8) Grafana starten ---
 export GF_SECURITY_ADMIN_USER="$GRAFANA_ADMIN_USER"
 export GF_SECURITY_ADMIN_PASSWORD="$GRAFANA_ADMIN_PASSWORD"
 service grafana-server start
 
-#telegraf --config "$GENERATED_CONF" &
 # --- 9) Container am Leben halten ---
 tail -f /dev/null

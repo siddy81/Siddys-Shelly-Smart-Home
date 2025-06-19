@@ -8,6 +8,7 @@ services:
       - "1883:1883"    # MQTT
       - "8083:8083"    # InfluxDB Admin UI
       - "8086:8086"    # InfluxDB HTTP API
+      - "3000:3000"    # Grafana
     volumes:
       - ./mosquitto/config/mosquitto.conf:/etc/mosquitto/mosquitto.conf:ro
       - ./telegraf/config/telegraf.conf:/etc/telegraf/telegraf.conf:ro

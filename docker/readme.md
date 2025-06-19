@@ -1,6 +1,6 @@
 # Shelly Control Center
 
-This repository contains the Docker configuration for the **Shelly Control Center** container, which combines OpenSSH and the Mosquitto MQTT broker.
+This directory contains the Docker configuration for the **Shelly Control Center**. The container bundles OpenSSH, Mosquitto, InfluxDB, Telegraf and Grafana in a single image so you can capture MQTT messages from your Shelly devices and visualise them directly in Grafana.
 
 ## Prerequisites
 
@@ -14,41 +14,37 @@ This repository contains the Docker configuration for the **Shelly Control Cente
 ├── docker-compose.yml
 ├── Dockerfile
 ├── entrypoint.sh
-└── mosquitto
-    └── config
-        └── mosquitto.conf
+├── influxdb
+├── mosquitto
+└── telegraf
 ```
 
 ## Configuration
 
-1. Customize your broker settings in `mosquitto/config/mosquitto.conf`.
-2. On container startup, the user and ACL are generated automatically from the environment variables:
-
-    * User: `MOSQUITTO_USER`
-    * Password: `MOSQUITTO_PASSWORD`
-3. SSH access is provided by `ADMIN_USER` and `ADMIN_PASSWORD`.
+1. Customize your broker settings in `mosquitto/config/mosquitto.conf` if needed.
+2. On container startup the credentials are taken from the following environment variables:
+    * `MOSQUITTO_USER` / `MOSQUITTO_PASSWORD` – MQTT broker login
+    * `ADMIN_USER` / `ADMIN_PASSWORD` – SSH login to the container
+    * `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` – Grafana admin account
+   Default values are defined in the `Dockerfile` and can be overridden when starting the container.
 
 ## Rebuild and Start the Container
 
-Run the following commands from the project root directory:
+Run the commands from this directory:
 
 ```bash
-# Stop and remove old containers and networks
 docker-compose down
-
-# Build the Docker image
-docker-compose build
-
-# Start containers in detached mode
-docker-compose up -d
-
-# Or combine build and start
+# build and start in one step
 docker-compose up -d --build
 ```
 
-## View Logs
+## Access
 
-To verify that both SSH and Mosquitto started correctly:
+* SSH: `ssh ADMIN_USER@localhost -p 2222`
+* Grafana: <http://localhost:3000>
+* MQTT broker: `localhost:1883`
+
+## View Logs
 
 ```bash
 docker-compose logs -f
@@ -56,35 +52,15 @@ docker-compose logs -f
 
 ## Subscribe to All MQTT Messages
 
-To view all incoming MQTT messages (from any topic) live, use the `mosquitto_sub` CLI tool:
-
 ```bash
 mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "#" -v
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_lamp_1/state" -C 1
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_dawid_schreibtisch/#" -v
-
-#send test 
-mosquitto_pub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly/json" -m '{"status":"ok","value":42}'
- mosquitto_pub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_dawid_schreibtisch/#" -m '{"status":"ok","value":42}'
-
 ```
 
-Flags explanation:
+## InfluxDB
 
-* `-h localhost`: MQTT broker address inside the container
-* `-p 1883`: Default MQTT port
-* `-u shelly`: Username
-* `-P shelly123456`: Password
-* `-t "#"`: Wildcard topic to receive all topics
-* `-v`: Verbose mode, shows both topic and payload
-
-All incoming messages will be printed directly to your terminal.
-
-
-
-## influx db
-
+```bash
 influx -precision rfc3339
 USE shelly
 SHOW MEASUREMENTS
 SELECT * FROM "temperature" LIMIT 10
+```

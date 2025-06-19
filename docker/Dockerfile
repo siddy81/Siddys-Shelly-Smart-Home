@@ -5,15 +5,22 @@ ENV ADMIN_USER=root
 ENV ADMIN_PASSWORD=root
 ENV MOSQUITTO_USER=shelly
 ENV MOSQUITTO_PASSWORD=shelly123456
+ENV GRAFANA_ADMIN_USER=admin
+ENV GRAFANA_ADMIN_PASSWORD=admin
 ENV DEBIAN_FRONTEND=noninteractive
 
 # --- Add InfluxData repo & install all packages ---
 RUN apt-get update && apt-get install -y gnupg curl && \
-    # InfluxData GPG key + repo
+    # InfluxData repository
     curl -fsSL https://repos.influxdata.com/influxdata-archive_compat.key \
       | gpg --dearmor -o /etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg && \
     echo "deb [signed-by=/etc/apt/trusted.gpg.d/influxdata-archive_compat.gpg] https://repos.influxdata.com/debian stable main" \
-      > /etc/apt/sources.list.d/influxdata.list
+      > /etc/apt/sources.list.d/influxdata.list && \
+    # Grafana repository
+    curl -fsSL https://packages.grafana.com/gpg.key \
+      | gpg --dearmor -o /usr/share/keyrings/grafana.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/grafana.gpg] https://packages.grafana.com/oss/deb stable main" \
+      > /etc/apt/sources.list.d/grafana.list
 
 RUN apt-get update && apt-get install -y \
       openssh-server \
@@ -22,6 +29,7 @@ RUN apt-get update && apt-get install -y \
       mosquitto-clients \
       influxdb \
       telegraf \
+      grafana \
       gettext-base && \
     apt-get clean
 
@@ -42,7 +50,7 @@ COPY influxdb/config/influxdb.conf   /etc/influxdb/influxdb.conf
 COPY influxdb/config/init-influxdb.iql /tmp/init-influxdb.iql
 
 
-EXPOSE 22 1883 8083 8086
+EXPOSE 22 1883 8083 8086 3000
 
 WORKDIR /tmp
 

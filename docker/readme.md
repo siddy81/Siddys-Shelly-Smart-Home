@@ -108,3 +108,16 @@ USE shelly_mqtt_db
 SHOW MEASUREMENTS
 SELECT * FROM "temperature" LIMIT 10
 ```
+
+## Docker Build Notes
+
+If the build fails with `error getting credentials` while pulling the public
+base image, your Docker configuration may reference a credential helper that is
+not logged in. Because the image is public you can disable BuildKit so that the
+helper is skipped:
+
+```bash
+DOCKER_BUILDKIT=0 docker-compose build
+```
+
+For private registries authenticate first via `docker login`.

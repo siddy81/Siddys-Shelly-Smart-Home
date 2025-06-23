@@ -36,7 +36,11 @@ RUN apt-get update && apt-get install -y \
 
 # --- Prepare directories ---
 RUN mkdir -p /run/mosquitto && chown mosquitto:mosquitto /run/mosquitto
-RUN mkdir -p /var/log/telegraf && chown telegraf:telegraf /var/log/telegraf
+RUN mkdir -p /var/log/mosquitto /var/log/influxdb /var/log/telegraf /var/log/grafana && \
+    chown mosquitto:mosquitto /var/log/mosquitto && \
+    chown influxdb:influxdb /var/log/influxdb && \
+    chown telegraf:telegraf /var/log/telegraf && \
+    chown grafana:grafana /var/log/grafana
 
 # --- SSH configuration ---
 RUN echo "$ADMIN_USER:$ADMIN_PASSWORD" | chpasswd && \

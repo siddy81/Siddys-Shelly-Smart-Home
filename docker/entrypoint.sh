@@ -31,13 +31,15 @@ chmod 640 "$ACL_FILE"
 service ssh start
 
 # --- 4) Mosquitto starten ---
-mosquitto -c /etc/mosquitto/mosquitto.conf &
+mosquitto -c /etc/mosquitto/mosquitto.conf \
+  > /var/log/mosquitto/mosquitto.log 2>&1 &
 
 
 
 # --- 5) InfluxDB starten + DB anlegen ---
 # 1) InfluxDB im Hintergrund starten
-influxd -config /etc/influxdb/influxdb.conf &
+influxd -config /etc/influxdb/influxdb.conf \
+  > /var/log/influxdb/influxd.log 2>&1 &
 INFLUXD_PID=$!
 
 # 2) Warten, bis HTTP-API erreichbar ist
@@ -66,12 +68,17 @@ fi
 envsubst '${MOSQUITTO_USER} ${MOSQUITTO_PASSWORD}' < "$TEMPLATE_CONF" > "$GENERATED_CONF"
 
 # --- 7) Telegraf starten ---
-telegraf --config "$GENERATED_CONF" &
+telegraf --config "$GENERATED_CONF" \
+  > /var/log/telegraf/telegraf.log 2>&1 &
 
 # --- 8) Grafana starten ---
 export GF_SECURITY_ADMIN_USER="$GRAFANA_ADMIN_USER"
 export GF_SECURITY_ADMIN_PASSWORD="$GRAFANA_ADMIN_PASSWORD"
-service grafana-server start
+mkdir -p /var/log/grafana
+grafana-server \
+  --homepath=/usr/share/grafana \
+  --config=/etc/grafana/grafana.ini \
+  >> /var/log/grafana/grafana.log 2>&1 &
 
 # --- 9) Container am Leben halten ---
 tail -f /dev/null

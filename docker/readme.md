@@ -82,6 +82,15 @@ Grafana, navigate to **Dashboards → Import**, upload the JSON file and select 
 docker-compose logs -f
 ```
 
+Service logs are also written inside the container:
+
+```
+/var/log/mosquitto/mosquitto.log
+/var/log/influxdb/influxd.log
+/var/log/telegraf/telegraf.log
+/var/log/grafana/grafana.log
+```
+
 ## Subscribe to All MQTT Messages
 
 ```bash

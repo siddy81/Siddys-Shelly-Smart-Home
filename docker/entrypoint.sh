@@ -1,3 +1,8 @@
+mkdir -p /var/log/mosquitto /var/log/influxdb /var/log/telegraf /var/log/grafana
+chown mosquitto:mosquitto /var/log/mosquitto
+chown influxdb:influxdb /var/log/influxdb
+chown telegraf:telegraf /var/log/telegraf
+chown grafana:grafana /var/log/grafana
 #!/bin/sh
 
 # --- Pfade ---

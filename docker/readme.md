@@ -36,7 +36,7 @@ The preconfigured logins are:
 | Service    | Username | Password      |
 |------------|---------|---------------|
 | SSH        | `root`  | `root`        |
-| Mosquitto  | `shelly`| `pw123456`|
+| Mosquitto  | `shelly` | `pw123456` |
 | Grafana    | `admin` | `admin`       |
 
 ### Shelly Device Setup
@@ -121,3 +121,4 @@ DOCKER_BUILDKIT=0 docker-compose build
 ```
 
 For private registries authenticate first via `docker login`.
+

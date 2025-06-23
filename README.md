@@ -23,7 +23,7 @@ docker exec -it mosquitto mosquitto_sub -h localhost -p 1883 -t "#" -v
 
 ### InfluxDB
 
-influx -database 'shelly_mqqt_db' -execute 'SELECT * FROM <measurement_name> LIMIT 10'
+influx -database 'shelly_mqtt_db' -execute 'SELECT * FROM <measurement_name> LIMIT 10'
 
 
 ### Telegraf

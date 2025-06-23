@@ -27,7 +27,7 @@ This directory contains the Docker configuration for the **Shelly Control Center
     * `ADMIN_USER` / `ADMIN_PASSWORD` – SSH login to the container
     * `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` – Grafana admin account
    Default values are defined in the `Dockerfile` and can be overridden when starting the container.
-3. On first start the database `shelly_mqqt_db` is created automatically for Telegraf.
+3. On first start the database `shelly_mqtt_db` is created automatically for Telegraf.
 
 ### Default Credentials
 
@@ -104,7 +104,7 @@ docker exec -it shelly_control_center \
 
 ```bash
 influx -precision rfc3339
-USE shelly_mqqt_db
+USE shelly_mqtt_db
 SHOW MEASUREMENTS
 SELECT * FROM "temperature" LIMIT 10
 ```

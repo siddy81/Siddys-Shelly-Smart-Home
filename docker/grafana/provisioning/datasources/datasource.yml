@@ -5,7 +5,7 @@ datasources:
     access: proxy
     orgId: 1
     url: http://localhost:8086
-    database: shelly_mqqt_db
+    database: shelly_mqtt_db
     user: telegraf
     password: TelegrafPasswort
     isDefault: true

@@ -61,6 +61,7 @@ WORKDIR /tmp
 
 
 # ganz unten in deinem Dockerfile
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+# explicitly invoke bash so the script always starts even if copied
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

@@ -33,11 +33,12 @@ This directory contains the Docker configuration for the **Shelly Control Center
 
 The preconfigured logins are:
 
-| Service    | Username | Password      |
-|------------|---------|---------------|
-| SSH        | `root`  | `root`        |
+| Service    | Username | Password          |
+|------------|---------|-------------------|
+| SSH        | `root`  | `root`            |
 | Mosquitto  | `shelly` | `pw123456` |
-| Grafana    | `admin` | `admin`       |
+| InfluxDB   | `admin` | `MeinAdminPasswort` |
+| Grafana    | `admin` | `admin`           |
 
 ### Shelly Device Setup
 
@@ -103,7 +104,7 @@ docker exec -it shelly_control_center \
 ## InfluxDB
 
 ```bash
-influx -precision rfc3339
+influx -username admin -password MeinAdminPasswort -precision rfc3339
 USE shelly_mqtt_db
 SHOW MEASUREMENTS
 SELECT * FROM "temperature" LIMIT 10

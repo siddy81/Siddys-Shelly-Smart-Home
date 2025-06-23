@@ -1,3 +1,5 @@
+ENV INFLUXDB_ADMIN_USER=admin
+ENV INFLUXDB_ADMIN_PASSWORD=MeinAdminPasswort
 FROM ubuntu:latest
 
 # Declare environment variables for credentials

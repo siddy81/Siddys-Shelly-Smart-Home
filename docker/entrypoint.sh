@@ -33,8 +33,11 @@ EOF
 chown mosquitto:mosquitto "$ACL_FILE"
 chmod 640 "$ACL_FILE"
 
-# --- 3) SSH starten ---
-service ssh start
+    echo "Initialisiere InfluxDB…"
+    influx -execute "CREATE USER ${INFLUXDB_ADMIN_USER} WITH PASSWORD '${INFLUXDB_ADMIN_PASSWORD}' WITH ALL PRIVILEGES" && \
+    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE DATABASE \"shelly_mqtt_db\"" && \
+    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE USER telegraf WITH PASSWORD 'TelegrafPasswort'" && \
+    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "GRANT ALL ON \"shelly_mqtt_db\" TO telegraf" && \
 
 # --- 4) Mosquitto starten as mosquitto user ---
 su -s /bin/sh mosquitto -c \

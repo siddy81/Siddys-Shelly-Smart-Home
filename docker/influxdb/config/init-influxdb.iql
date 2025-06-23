@@ -1,5 +1,5 @@
 -- init-influxdb.iql
 CREATE USER admin WITH PASSWORD 'MeinAdminPasswort' WITH ALL PRIVILEGES;
-CREATE DATABASE "shelly";
+CREATE DATABASE "shelly_mqqt_db";
 CREATE USER telegraf WITH PASSWORD 'TelegrafPasswort';
-GRANT ALL ON "shelly" TO "telegraf";
+GRANT ALL ON "shelly_mqqt_db" TO "telegraf";

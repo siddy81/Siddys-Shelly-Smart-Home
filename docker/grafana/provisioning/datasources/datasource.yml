@@ -1,0 +1,13 @@
+apiVersion: 1
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    access: proxy
+    orgId: 1
+    url: http://localhost:8086
+    database: shelly_mqqt_db
+    user: telegraf
+    password: TelegrafPasswort
+    isDefault: true
+    version: 1
+    editable: false

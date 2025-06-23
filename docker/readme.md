@@ -27,6 +27,7 @@ This directory contains the Docker configuration for the **Shelly Control Center
     * `ADMIN_USER` / `ADMIN_PASSWORD` – SSH login to the container
     * `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` – Grafana admin account
    Default values are defined in the `Dockerfile` and can be overridden when starting the container.
+3. On first start the database `shelly_mqqt_db` is created automatically for Telegraf.
 
 ### Default Credentials
 
@@ -35,7 +36,7 @@ The preconfigured logins are:
 | Service    | Username | Password      |
 |------------|---------|---------------|
 | SSH        | `root`  | `root`        |
-| Mosquitto  | `shelly`| `shelly123456`|
+| Mosquitto  | `shelly`| `pw123456`|
 | Grafana    | `admin` | `admin`       |
 
 ### Shelly Device Setup
@@ -67,7 +68,7 @@ docker-compose up -d --build
 
 ### Grafana Dashboard
 
-Import the dashboard JSON from `grafana/shelly_dashboard.json` to get an
+Import the dashboard JSON from `grafana/dashboards/shelly_dashboard.json` to get an
 overview of temperature and power consumption for your Shelly devices. In
 Grafana, navigate to **Dashboards → Import**, upload the JSON file and select the
 `InfluxDB` data source when prompted.
@@ -94,14 +95,16 @@ Service logs are also written inside the container:
 ## Subscribe to All MQTT Messages
 
 ```bash
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "#" -v
+docker exec -it shelly_control_center \
+  mosquitto_sub -h localhost -p 1883 \
+  -t "#" -u "shelly" -P "pw123456" -v
 ```
 
 ## InfluxDB
 
 ```bash
 influx -precision rfc3339
-USE shelly
+USE shelly_mqqt_db
 SHOW MEASUREMENTS
 SELECT * FROM "temperature" LIMIT 10
 ```

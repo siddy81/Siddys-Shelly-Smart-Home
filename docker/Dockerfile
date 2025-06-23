@@ -4,7 +4,7 @@ FROM ubuntu:25.04
 ENV ADMIN_USER=root
 ENV ADMIN_PASSWORD=root
 ENV MOSQUITTO_USER=shelly
-ENV MOSQUITTO_PASSWORD=shelly123456
+ENV MOSQUITTO_PASSWORD=pw123456
 ENV GRAFANA_ADMIN_USER=admin
 ENV GRAFANA_ADMIN_PASSWORD=admin
 ENV DEBIAN_FRONTEND=noninteractive
@@ -52,6 +52,8 @@ COPY mosquitto/config/mosquitto.conf /etc/mosquitto/mosquitto.conf
 COPY telegraf/config/telegraf.conf   /etc/telegraf/telegraf.conf
 COPY influxdb/config/influxdb.conf   /etc/influxdb/influxdb.conf
 COPY influxdb/config/init-influxdb.iql /tmp/init-influxdb.iql
+COPY grafana/provisioning /etc/grafana/provisioning
+COPY grafana/dashboards /etc/grafana/dashboards
 
 
 EXPOSE 22 1883 8083 8086 3000

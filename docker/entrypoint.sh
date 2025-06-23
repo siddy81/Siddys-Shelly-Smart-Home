@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/bin/sh
 
 # --- Pfade ---
 MOSQ_CONF_DIR=/etc/mosquitto

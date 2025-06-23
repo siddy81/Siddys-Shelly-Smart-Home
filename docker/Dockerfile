@@ -1,4 +1,4 @@
-FROM ubuntu:25.04
+FROM ubuntu:22.04
 
 # Declare environment variables for credentials
 ENV ADMIN_USER=root

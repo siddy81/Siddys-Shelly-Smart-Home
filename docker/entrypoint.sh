@@ -39,6 +39,9 @@ chmod 640 "$ACL_FILE"
     influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE USER telegraf WITH PASSWORD 'TelegrafPasswort'" && \
     influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "GRANT ALL ON \"shelly_mqtt_db\" TO telegraf" && \
 
+# ssh start
+service ssh start
+
 # --- 4) Mosquitto starten as mosquitto user ---
 su -s /bin/sh mosquitto -c \
   "mosquitto -c /etc/mosquitto/mosquitto.conf \

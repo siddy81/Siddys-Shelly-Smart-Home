@@ -1,5 +1,3 @@
-ENV INFLUXDB_ADMIN_USER=admin
-ENV INFLUXDB_ADMIN_PASSWORD=MeinAdminPasswort
 FROM ubuntu:latest
 
 # Declare environment variables for credentials
@@ -10,6 +8,8 @@ ENV MOSQUITTO_PASSWORD=pw123456
 ENV GRAFANA_ADMIN_USER=admin
 ENV GRAFANA_ADMIN_PASSWORD=admin
 ENV DEBIAN_FRONTEND=noninteractive
+ENV INFLUXDB_ADMIN_USER=admin
+ENV INFLUXDB_ADMIN_PASSWORD=MeinAdminPasswort
 
 # --- Add InfluxData repo & install all packages ---
 RUN apt-get update && apt-get install -y gnupg curl && \
@@ -67,4 +67,4 @@ WORKDIR /tmp
 # ganz unten in deinem Dockerfile
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+CMD ["/entrypoint.sh"]

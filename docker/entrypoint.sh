@@ -33,24 +33,16 @@ EOF
 chown mosquitto:mosquitto "$ACL_FILE"
 chmod 640 "$ACL_FILE"
 
-    echo "Initialisiere InfluxDB…"
-    influx -execute "CREATE USER ${INFLUXDB_ADMIN_USER} WITH PASSWORD '${INFLUXDB_ADMIN_PASSWORD}' WITH ALL PRIVILEGES" && \
-    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE DATABASE \"shelly_mqtt_db\"" && \
-    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "CREATE USER telegraf WITH PASSWORD 'TelegrafPasswort'" && \
-    influx -username ${INFLUXDB_ADMIN_USER} -password ${INFLUXDB_ADMIN_PASSWORD} -execute "GRANT ALL ON \"shelly_mqtt_db\" TO telegraf" && \
 
 # ssh start
 service ssh start
 
 # --- 4) Mosquitto starten as mosquitto user ---
-su -s /bin/sh mosquitto -c \
-  "mosquitto -c /etc/mosquitto/mosquitto.conf \
-    >> /var/log/mosquitto/mosquitto.log 2>&1 &"
+su -s /bin/sh mosquitto -c "mosquitto -c /etc/mosquitto/mosquitto.conf >> /var/log/mosquitto/mosquitto.log 2>&1 &"
 
 # --- 5) InfluxDB starten + DB anlegen ---
 # 5.1) Start InfluxDB in background
-influxd -config /etc/influxdb/influxdb.conf \
-  >> /var/log/influxdb/influxd.log 2>&1 &
+influxd -config /etc/influxdb/influxdb.conf >> /var/log/influxdb/influxd.log 2>&1 &
 
 INFLUXD_PID=$!
 
@@ -60,13 +52,21 @@ until curl -s http://localhost:8086/ping >/dev/null; do
   sleep 1
 done
 
+envsubst '${INFLUXDB_ADMIN_USER} ${INFLUXDB_ADMIN_PASSWORD} ${INFLUXDB_TELEGRAF_USER} ${INFLUXDB_TELEGRAF_PASSWORD}' \
+  < /tmp/init-influxdb.iql > /tmp/init-influxdb.rendered.iql && mv /tmp/init-influxdb.rendered.iql /tmp/init-influxdb.iql
+
+# Force re-import on every start (entfernt das “initialized”-Flag)
+rm -f /var/lib/influxdb/.influxdb_initialized
+
 # 5.3) Initial import (if not yet done)
 if [ -f /var/lib/influxdb/.influxdb_initialized ]; then
     echo "InfluxDB already initialized – skipping import."
 else
     echo "Importing initial script…"
-    influx -precision rfc3339 -import -path /tmp/init-influxdb.iql && \
+    influx -username "${INFLUXDB_ADMIN_USER}" -password "${INFLUXDB_ADMIN_PASSWORD}" \
+       -precision rfc3339 -import -path /tmp/init-influxdb.iql && \
     touch /var/lib/influxdb/.influxdb_initialized
+    echo "Imported..."
 fi
 
 # --- 6) Telegraf-Config generieren ---
@@ -74,21 +74,20 @@ if [ ! -f "$TEMPLATE_CONF" ]; then
   echo "ERROR: Template $TEMPLATE_CONF not found!" >&2
   exec tail -f /dev/null
 fi
-envsubst '${MOSQUITTO_USER} ${MOSQUITTO_PASSWORD}' < "$TEMPLATE_CONF" > "$GENERATED_CONF"
+envsubst '${MOSQUITTO_USER} ${MOSQUITTO_PASSWORD} ${INFLUXDB_TELEGRAF_USER} ${INFLUXDB_TELEGRAF_PASSWORD}'  < "$TEMPLATE_CONF" > "$GENERATED_CONF"
 
 # --- 7) Telegraf starten ---
-su -s /bin/sh telegraf -c \
-  "telegraf --config '$GENERATED_CONF' \
-    >> /var/log/telegraf/telegraf.log 2>&1 &"
+su -s /bin/sh telegraf -c "telegraf --config '$GENERATED_CONF'  >> /var/log/telegraf/telegraf.log 2>&1 &"
 
 # --- 8) Grafana starten ---
 export GF_SECURITY_ADMIN_USER="$GRAFANA_ADMIN_USER"
 export GF_SECURITY_ADMIN_PASSWORD="$GRAFANA_ADMIN_PASSWORD"
-su -s /bin/sh grafana -c \
-  "grafana-server \
-    --homepath=/usr/share/grafana \
-    --config=/etc/grafana/grafana.ini \
-    >> /var/log/grafana/grafana.log 2>&1 &"
+su -s /bin/sh grafana -c "grafana-server --homepath=/usr/share/grafana \
+    --config=/etc/grafana/grafana.ini >> /var/log/grafana/grafana.log 2>&1 &"
 
 # --- 9) Container am Leben halten ---
 tail -f /dev/null
+
+# ssh starten
+exec /usr/sbin/sshd -D
+

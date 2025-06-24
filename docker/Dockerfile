@@ -10,6 +10,9 @@ ENV GRAFANA_ADMIN_PASSWORD=admin
 ENV DEBIAN_FRONTEND=noninteractive
 ENV INFLUXDB_ADMIN_USER=admin
 ENV INFLUXDB_ADMIN_PASSWORD=MeinAdminPasswort
+ENV INFLUXDB_TELEGRAF_USER=telegraf
+ENV INFLUXDB_TELEGRAF_PASSWORD=TelegrafPasswort
+
 
 # --- Add InfluxData repo & install all packages ---
 RUN apt-get update && apt-get install -y gnupg curl && \

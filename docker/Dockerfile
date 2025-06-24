@@ -67,4 +67,4 @@ WORKDIR /tmp
 # ganz unten in deinem Dockerfile
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]

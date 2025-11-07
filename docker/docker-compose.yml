@@ -10,25 +10,12 @@ services:
     environment:
       MQTT_USERNAME: ${MQTT_USERNAME:-shelly}
       MQTT_PASSWORD: ${MQTT_PASSWORD:-123456}
+    entrypoint: ["/mosquitto-entrypoint.sh"]
     volumes:
+      - ./mosquitto/entrypoint.sh:/mosquitto-entrypoint.sh:ro
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
-    entrypoint:
-      - /bin/sh
-      - -c
-      - |
-        set -eu
-        PASSFILE="/mosquitto/config/passwordfile"
-        TMPPASS="$(mktemp)"
-        trap 'rm -f "$TMPPASS"' EXIT INT TERM
-        MQTT_USER="${MQTT_USERNAME:-shelly}"
-        MQTT_PASS="${MQTT_PASSWORD:-123456}"
-        mosquitto_passwd -b -c "$TMPPASS" "$MQTT_USER" "$MQTT_PASS"
-        mv "$TMPPASS" "$PASSFILE"
-        trap - EXIT INT TERM
-        chmod 600 "$PASSFILE" || true
-        exec mosquitto -c /mosquitto/config/mosquitto.conf
 
   influxdb:
     image: influxdb:1.8

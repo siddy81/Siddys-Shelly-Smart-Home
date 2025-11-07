@@ -37,6 +37,8 @@ Alle Services laufen in Docker-Containern und können über `docker compose` gem
    ```bash
    docker compose up -d
    ```
+   Beim Start erzeugt der Mosquitto-Container automatisch eine Passwortdatei in `mosquitto/config/passwordfile` auf Basis der
+   gesetzten Variablen `MQTT_USERNAME` und `MQTT_PASSWORD`.
 4. Grafana-Dashboard öffnen: <http://localhost:12345>
 
 ### MQTT-Anbindung der Shelly-Geräte

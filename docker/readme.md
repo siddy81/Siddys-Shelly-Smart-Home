@@ -25,7 +25,7 @@ Nach dem Start steht das Dashboard unter [http://localhost:12345](http://localho
 
 ## Konfiguration
 
-- **Mosquitto**: Die Broker-Konfiguration liegt unter `mosquitto/config/mosquitto.conf`. Anonyme Verbindungen sind deaktiviert; die Passwortdatei `mosquitto/config/passwordfile` wird beim Start automatisch anhand von `MQTT_USERNAME` / `MQTT_PASSWORD` erzeugt.
+- **Mosquitto**: Die Broker-Konfiguration liegt unter `mosquitto/config/mosquitto.conf`. Anonyme Verbindungen sind deaktiviert; die Passwortdatei `mosquitto/config/passwordfile` wird beim Start der lokal gebauten Mosquitto-Variante automatisch anhand von `MQTT_USERNAME` / `MQTT_PASSWORD` erzeugt.
 - **Telegraf**: Die Datei `telegraf/telegraf.conf` definiert, welche MQTT-Themen abonniert und wie sie nach InfluxDB geschrieben werden. Die Umgebungsvariablen `MQTT_USERNAME` und `MQTT_PASSWORD` werden automatisch ausgewertet.
 - **InfluxDB**: Persistente Daten liegen im Volume `influxdb/data`. Standardmäßig wird die Datenbank `shelly` ohne Authentifizierung angelegt.
 - **Grafana**: Dashboards und Datenquellen werden per Provisioning aus `grafana/` geladen. Das bereitgestellte Dashboard heißt **Shelly Smart Home Overview**.

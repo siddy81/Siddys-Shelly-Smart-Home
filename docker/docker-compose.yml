@@ -2,7 +2,9 @@ version: "3.8"
 
 services:
   mosquitto:
-    image: eclipse-mosquitto:2.0
+    build:
+      context: ./mosquitto
+    image: shelly-mosquitto:local
     container_name: shelly-mosquitto
     restart: unless-stopped
     ports:
@@ -10,9 +12,7 @@ services:
     environment:
       MQTT_USERNAME: ${MQTT_USERNAME:-shelly}
       MQTT_PASSWORD: ${MQTT_PASSWORD:-123456}
-    entrypoint: ["/mosquitto-entrypoint.sh"]
     volumes:
-      - ./mosquitto/entrypoint.sh:/mosquitto-entrypoint.sh:ro
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log

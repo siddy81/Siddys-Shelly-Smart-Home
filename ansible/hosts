@@ -1,2 +1,0 @@
-[raspberrypi]
-localhost ansible_user=user ansible_password=strengGeheim

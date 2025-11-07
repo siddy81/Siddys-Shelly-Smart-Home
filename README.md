@@ -28,7 +28,7 @@ Alle Services laufen in Docker-Containern und können über `docker compose` gem
    git clone https://github.com/<ihr-account>/Siddys-Shelly-Smart-Home.git
    cd Siddys-Shelly-Smart-Home/docker
    ```
-2. Optional: `.env` aus dem Template erstellen, um Zugangsdaten anzupassen:
+2. `.env` aus dem Template erstellen und bei Bedarf Zugangsdaten anpassen:
    ```bash
    cp example.env .env
    # Werte für MQTT_USERNAME, MQTT_PASSWORD und GRAFANA_ADMIN_PASSWORD setzen
@@ -43,7 +43,8 @@ Alle Services laufen in Docker-Containern und können über `docker compose` gem
 
 - Broker-Adresse: IP des Docker-Hosts, Port `1883`
 - Topics: Das Telegraf-Setup überwacht standardmäßig `shellies/#`. Eigene Geräte können ohne zusätzliche Konfiguration publizieren.
-- Falls Authentifizierung benötigt wird, `allow_anonymous` in `docker/mosquitto/config/mosquitto.conf` deaktivieren und ein Passwortfile hinterlegen. Die Zugangsdaten müssen dann in `.env` übernommen werden.
+- Standard-Zugangsdaten: Benutzername `shelly`, Passwort `123456`. Die Werte lassen sich über `.env` (Variablen `MQTT_USERNAME` und `MQTT_PASSWORD`) anpassen.
+- Shelly-Geräte müssen dieselben Zugangsdaten verwenden (Menü: **Einstellungen → Internet & Sicherheit → Erweitert → MQTT**).
 
 ## Datenmodell
 
@@ -75,7 +76,7 @@ docker compose exec influxdb influx -database shelly -execute "SELECT * FROM she
 
 ## Sicherheitshinweise
 
-- Setzen Sie in Produktion individuelle Passwörter für den MQTT-Broker und Grafana.
+- Ersetzen Sie die mitgelieferten Standardpasswörter (`shelly` / `123456`) für den MQTT-Broker sowie die Grafana-Admin-Zugangsdaten.
 - Aktivieren Sie HTTPS vor dem Exponieren des Dashboards im öffentlichen Internet.
 - Beschränken Sie die Netzwerkanbindung der Shelly-Geräte auf das nötige Minimum (Firewall/VLAN).
 

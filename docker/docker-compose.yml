@@ -9,6 +9,7 @@ services:
       - "1883:1883"
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+      - ./mosquitto/config/passwordfile:/mosquitto/config/passwordfile:ro
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
 
@@ -32,8 +33,8 @@ services:
       - mosquitto
       - influxdb
     environment:
-      MQTT_USERNAME: ${MQTT_USERNAME:-}
-      MQTT_PASSWORD: ${MQTT_PASSWORD:-}
+      MQTT_USERNAME: ${MQTT_USERNAME:-shelly}
+      MQTT_PASSWORD: ${MQTT_PASSWORD:-123456}
     volumes:
       - ./telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
 

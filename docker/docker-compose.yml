@@ -2,11 +2,10 @@ version: "3.8"
 
 services:
   mosquitto:
-    build:
-      context: ./mosquitto
-    image: shelly-mosquitto:local
+    image: eclipse-mosquitto:2.0
     container_name: shelly-mosquitto
     restart: unless-stopped
+    user: "0"
     ports:
       - "1883:1883"
     environment:
@@ -16,6 +15,24 @@ services:
       - ./mosquitto/config:/mosquitto/config
       - ./mosquitto/data:/mosquitto/data
       - ./mosquitto/log:/mosquitto/log
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -eu
+        PASSFILE=/mosquitto/config/passwordfile
+        TMP=$$(mktemp)
+        mosquitto_passwd -b -c "$$TMP" "$$MQTT_USERNAME" "$$MQTT_PASSWORD"
+        mv "$$TMP" "$$PASSFILE"
+        chmod 600 "$$PASSFILE" || true
+        chown mosquitto:mosquitto "$$PASSFILE" || true
+        if command -v su-exec >/dev/null 2>&1; then
+          exec su-exec mosquitto mosquitto -c /mosquitto/config/mosquitto.conf
+        elif command -v gosu >/dev/null 2>&1; then
+          exec gosu mosquitto mosquitto -c /mosquitto/config/mosquitto.conf
+        else
+          exec mosquitto -c /mosquitto/config/mosquitto.conf
+        fi
 
   influxdb:
     image: influxdb:1.8

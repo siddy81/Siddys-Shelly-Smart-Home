@@ -20,20 +20,19 @@ services:
       - |
         set -eu
         PASSFILE="/mosquitto/config/passwordfile"
+        TMPPASS="$(mktemp)"
+        trap 'rm -f "$TMPPASS"' EXIT INT TERM
         MQTT_USER="${MQTT_USERNAME:-}"
         MQTT_PASS="${MQTT_PASSWORD:-}"
         if [ -z "$MQTT_USER" ] || [ -z "$MQTT_PASS" ]; then
           echo "MQTT_USERNAME and MQTT_PASSWORD must be set" >&2
           exit 1
         fi
-        if [ ! -f "$PASSFILE" ] || ! grep -qF "$MQTT_USER:" "$PASSFILE"; then
-          mosquitto_passwd -b "$PASSFILE" "$MQTT_USER" "$MQTT_PASS"
-        fi
-        exec /docker-entrypoint.sh "$@"
-    command:
-      - mosquitto
-      - -c
-      - /mosquitto/config/mosquitto.conf
+        mosquitto_passwd -b -c "$TMPPASS" "$MQTT_USER" "$MQTT_PASS"
+        mv "$TMPPASS" "$PASSFILE"
+        trap - EXIT INT TERM
+        chmod 600 "$PASSFILE" || true
+        exec mosquitto -c /mosquitto/config/mosquitto.conf
 
   influxdb:
     image: influxdb:1.8

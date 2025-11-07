@@ -1,80 +1,84 @@
+# Shelly Smart Home Monitoring
 
-# Daves Shelly Smart Home Project
+Dieses Projekt stellt eine vollständig containerisierte Referenzarchitektur bereit, um Sensordaten von Shelly-Geräten zentral zu sammeln, zu speichern und in Echtzeit zu visualisieren. Die Kommunikation zwischen allen Komponenten erfolgt über MQTT.
 
-Welcome to the Daves Shelly Smart Home Project! This project integrates Shelly devices into a smart home system that is visualized through a Grafana dashboard and controlled via MQTT with Mosquitto and Telegraf. The automation enhances comfort, energy efficiency, and security within the home. This project is intended for private use and aims to simplify the setup process for individuals.
+## Architekturüberblick
 
-## Prerequisites
-
-Ensure the following components are in place before starting the setup:
-
-- Shelly devices as required (e.g., Shelly 1, Shelly Plug)
-- Access to the local network
-- Grafana, Mosquitto, and Telegraf installed and operational
-
-## Installation and Configuration
-
-### Mosquitto
-
-Start with the configuration of Mosquitto. A sample configuration file can be found in the `config/mosquitto.conf` directory. Adjust this file as needed to suit your network environment.
-
-docker exec -it mosquitto mosquitto_sub -h localhost -t '#' -u "shelly" -P "pw123456" -v
-docker exec -it mosquitto mosquitto_sub -h localhost -p 1883 -t "#" -v
-
-
-### InfluxDB
-
-influx -database 'shelly_mqqt_db' -execute 'SELECT * FROM <measurement_name> LIMIT 10'
-
-
-### Telegraf
-
-Configure Telegraf to collect and forward data from your Shelly devices. An example Telegraf configuration can be found at `config/telegraf.conf`.
-
-### Grafana
-
-Download the provided Grafana dashboard JSON file and import it into your Grafana instance. This dashboard provides a visual overview of the status and activity of your Shelly devices.
-
-## System Architecture
-
-Here is a diagram illustrating the data flow within the Shelly Smart Home system:
-
-```mermaid
-graph LR    
-	Shelly1(Shelly 1) --> Mosquitto
-	Shelly2(Shelly 2) --> Mosquitto
-	ShellyN(Shelly N) --> Mosquitto
-	Mosquitto --> Telegraf
-	Telegraf --> InfluxDB
-	InfluxDB --> Grafana
-	InfluxDB --> Chronograf
+```text
+Shelly-Gerät ─▶ Mosquitto (MQTT Broker) ─▶ Telegraf ─▶ InfluxDB ─▶ Grafana
 ```
 
-This setup ensures that data from your Shelly devices is efficiently processed and displayed.
+- **Mosquitto** empfängt alle MQTT-Nachrichten der Shelly-Geräte.
+- **Telegraf** abonniert die relevanten Topics, normalisiert die Daten und schreibt sie in die Zeitreihendatenbank.
+- **InfluxDB** speichert Stromverbrauch, Zustände sowie Temperatur- und Feuchtigkeitswerte.
+- **Grafana** visualisiert die Messwerte in einem bereitgestellten Dashboard, das öffentlich unter Port `12345` erreichbar ist.
 
-## Security Notes
+Alle Services laufen in Docker-Containern und können über `docker compose` gemeinsam verwaltet werden.
 
-The default password set for testing purposes is `pw123456`. It is crucial to change this password for production use. Choose a strong, unique password to ensure the security of your system.
+## Voraussetzungen
 
-## Usage
+- Docker 20.x oder neuer
+- Docker Compose Plugin (`docker compose`)
+- Shelly-Geräte, die ihre Messwerte per MQTT publizieren
 
-Once all components are installed and configured, you can monitor and control your Shelly Smart Home System via the Grafana dashboard.
+## Installation & Betrieb
 
-## Contributing to the Project
+1. Repository klonen und ins Docker-Verzeichnis wechseln:
+   ```bash
+   git clone https://github.com/<ihr-account>/Siddys-Shelly-Smart-Home.git
+   cd Siddys-Shelly-Smart-Home/docker
+   ```
+2. Optional: `.env` aus dem Template erstellen, um Zugangsdaten anzupassen:
+   ```bash
+   cp example.env .env
+   # Werte für MQTT_USERNAME, MQTT_PASSWORD und GRAFANA_ADMIN_PASSWORD setzen
+   ```
+3. Stack starten:
+   ```bash
+   docker compose up -d
+   ```
+4. Grafana-Dashboard öffnen: <http://localhost:12345>
 
-Your contributions are welcome. If you have suggestions for improvements or need to correct errors, we look forward to your participation. Please submit your suggestions as issues or pull requests to the appropriate repository.
+### MQTT-Anbindung der Shelly-Geräte
 
-## License
+- Broker-Adresse: IP des Docker-Hosts, Port `1883`
+- Topics: Das Telegraf-Setup überwacht standardmäßig `shellies/#`. Eigene Geräte können ohne zusätzliche Konfiguration publizieren.
+- Falls Authentifizierung benötigt wird, `allow_anonymous` in `docker/mosquitto/config/mosquitto.conf` deaktivieren und ein Passwortfile hinterlegen. Die Zugangsdaten müssen dann in `.env` übernommen werden.
 
-This project is licensed under the MIT License, which allows you to use, modify, and distribute it freely.
+## Datenmodell
 
-## Contact
+Telegraf erzeugt zwei Messungen in InfluxDB:
 
-Do you have any questions or suggestions? Send me a pull request or open an issue in our project repository. 
-I look forward to your contributions and good discussions!
+- `shelly_measurements`: numerische Werte (Leistung, Energie, Temperatur, Luftfeuchtigkeit, Batteriestände). Die Felder werden als `reading` gespeichert und können über die Tags `device` und `topic` gefiltert werden.
+- `shelly_states`: textuelle Zustände (Tür-/Fenstersensoren, Eingangsereignisse). Die aktuelle Ausprägung liegt im Feld `state`.
 
+Diese Struktur ermöglicht flexible Auswertungen in Grafana. Das bereitgestellte Dashboard enthält u. a. aktuelle Leistungswerte, Zeitreihen sowie eine Status-Tabelle für Tür- und Fensterkontakte.
 
-Best of luck implementing and using your Shelly Smart Home Project!
+## Nützliche Kommandos
 
----
+```bash
+# Status aller Container prüfen
+docker compose ps
 
-For purchasing related hardware, you may consider checking this link: [Amazon](https://amzn.to/3TIPj7f).
+# Logs eines Dienstes anzeigen (z. B. Telegraf)
+docker compose logs -f telegraf
+
+# MQTT-Nachrichten live beobachten
+mosquitto_sub -h localhost -p 1883 -t "shellies/#" -v
+
+# Testwert publizieren
+mosquitto_pub -h localhost -p 1883 -t "shellies/test/relay/0/power" -m "75"
+
+# Direktabfrage in InfluxDB
+docker compose exec influxdb influx -database shelly -execute "SELECT * FROM shelly_measurements LIMIT 5"
+```
+
+## Sicherheitshinweise
+
+- Setzen Sie in Produktion individuelle Passwörter für den MQTT-Broker und Grafana.
+- Aktivieren Sie HTTPS vor dem Exponieren des Dashboards im öffentlichen Internet.
+- Beschränken Sie die Netzwerkanbindung der Shelly-Geräte auf das nötige Minimum (Firewall/VLAN).
+
+## Lizenz
+
+Dieses Projekt steht unter der MIT-Lizenz. Beiträge und Erweiterungen sind willkommen.

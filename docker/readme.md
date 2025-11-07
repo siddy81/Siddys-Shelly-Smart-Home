@@ -1,90 +1,46 @@
-# Shelly Control Center
+# Shelly Smart Home Monitoring – Docker Setup
 
-This repository contains the Docker configuration for the **Shelly Control Center** container, which combines OpenSSH and the Mosquitto MQTT broker.
+Dieses Verzeichnis enthält die vollständige Docker-Umgebung für das Shelly Smart Home Monitoring. Sie besteht aus vier eigenständigen Containern, die per MQTT Daten austauschen und die Messwerte in Echtzeit visualisieren.
 
-## Prerequisites
+## Container
 
-* Docker
-* Docker Compose
+| Dienst     | Zweck                                   | Wichtige Ports |
+|------------|-----------------------------------------|----------------|
+| Mosquitto  | MQTT-Broker für alle Shelly-Geräte      | 1883           |
+| Telegraf   | MQTT-Subscriber und Forwarder zu Influx | –              |
+| InfluxDB   | Zeitreihendatenbank                     | 8086           |
+| Grafana    | Dashboard & Visualisierung              | 12345          |
 
-## Directory Structure
+Alle Dienste teilen sich das interne Docker-Netzwerk, wodurch der Datenfluss Shelly → Mosquitto → Telegraf → InfluxDB → Grafana ohne zusätzliche Konfiguration funktioniert.
 
-```
-.
-├── docker-compose.yml
-├── Dockerfile
-├── entrypoint.sh
-└── mosquitto
-    └── config
-        └── mosquitto.conf
-```
-
-## Configuration
-
-1. Customize your broker settings in `mosquitto/config/mosquitto.conf`.
-2. On container startup, the user and ACL are generated automatically from the environment variables:
-
-    * User: `MOSQUITTO_USER`
-    * Password: `MOSQUITTO_PASSWORD`
-3. SSH access is provided by `ADMIN_USER` and `ADMIN_PASSWORD`.
-
-## Rebuild and Start the Container
-
-Run the following commands from the project root directory:
+## Schnellstart
 
 ```bash
-# Stop and remove old containers and networks
-docker-compose down
-
-# Build the Docker image
-docker-compose build
-
-# Start containers in detached mode
-docker-compose up -d
-
-# Or combine build and start
-docker-compose up -d --build
+cd docker
+cp example.env .env  # enthält die Standard-Zugangsdaten (MQTT & Grafana)
+docker compose up -d
 ```
 
-## View Logs
+Nach dem Start steht das Dashboard unter [http://localhost:12345](http://localhost:12345) zur Verfügung. Der anonyme Lesezugriff ist bereits aktiviert, das Admin-Passwort kann über `GRAFANA_ADMIN_PASSWORD` angepasst werden.
 
-To verify that both SSH and Mosquitto started correctly:
+## Konfiguration
+
+- **Mosquitto**: Die Broker-Konfiguration liegt unter `mosquitto/config/mosquitto.conf`. Anonyme Verbindungen sind deaktiviert; die Passwortdatei `mosquitto/config/passwordfile` wird beim Start automatisch anhand von `MQTT_USERNAME` / `MQTT_PASSWORD` erzeugt.
+- **Telegraf**: Die Datei `telegraf/telegraf.conf` definiert, welche MQTT-Themen abonniert und wie sie nach InfluxDB geschrieben werden. Die Umgebungsvariablen `MQTT_USERNAME` und `MQTT_PASSWORD` werden automatisch ausgewertet.
+- **InfluxDB**: Persistente Daten liegen im Volume `influxdb/data`. Standardmäßig wird die Datenbank `shelly` ohne Authentifizierung angelegt.
+- **Grafana**: Dashboards und Datenquellen werden per Provisioning aus `grafana/` geladen. Das bereitgestellte Dashboard heißt **Shelly Smart Home Overview**.
+
+## Nützliche Befehle
 
 ```bash
-docker-compose logs -f
+# Container-Logs verfolgen
+docker compose logs -f
+
+# MQTT-Test-Nachricht senden
+mosquitto_pub -h localhost -p 1883 -t "shellies/test-device/relay/0/power" -m "42"
+
+# Letzte Power-Werte direkt aus InfluxDB lesen
+docker compose exec influxdb influx -database shelly -execute "SELECT * FROM shelly_measurements LIMIT 5"
 ```
 
-## Subscribe to All MQTT Messages
-
-To view all incoming MQTT messages (from any topic) live, use the `mosquitto_sub` CLI tool:
-
-```bash
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "#" -v
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_lamp_1/state" -C 1
-mosquitto_sub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_dawid_schreibtisch/#" -v
-
-#send test 
-mosquitto_pub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly/json" -m '{"status":"ok","value":42}'
- mosquitto_pub -h localhost -p 1883 -u shelly -P shelly123456 -t "shelly_dawid_schreibtisch/#" -m '{"status":"ok","value":42}'
-
-```
-
-Flags explanation:
-
-* `-h localhost`: MQTT broker address inside the container
-* `-p 1883`: Default MQTT port
-* `-u shelly`: Username
-* `-P shelly123456`: Password
-* `-t "#"`: Wildcard topic to receive all topics
-* `-v`: Verbose mode, shows both topic and payload
-
-All incoming messages will be printed directly to your terminal.
-
-
-
-## influx db
-
-influx -precision rfc3339
-USE shelly
-SHOW MEASUREMENTS
-SELECT * FROM "temperature" LIMIT 10
+Viel Spaß beim Monitoring Ihres Shelly Smart Homes!

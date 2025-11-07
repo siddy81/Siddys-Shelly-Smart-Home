@@ -1,0 +1,13 @@
+apiVersion: 1
+
+providers:
+  - name: Shelly Dashboards
+    orgId: 1
+    folder: Shelly Smart Home
+    type: file
+    disableDeletion: true
+    editable: true
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/dashboards

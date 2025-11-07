@@ -1,1 +1,2 @@
 *.pem
+docker/mosquitto/config/passwordfile

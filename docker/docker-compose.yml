@@ -22,12 +22,8 @@ services:
         PASSFILE="/mosquitto/config/passwordfile"
         TMPPASS="$(mktemp)"
         trap 'rm -f "$TMPPASS"' EXIT INT TERM
-        MQTT_USER="${MQTT_USERNAME:-}"
-        MQTT_PASS="${MQTT_PASSWORD:-}"
-        if [ -z "$MQTT_USER" ] || [ -z "$MQTT_PASS" ]; then
-          echo "MQTT_USERNAME and MQTT_PASSWORD must be set" >&2
-          exit 1
-        fi
+        MQTT_USER="${MQTT_USERNAME:-shelly}"
+        MQTT_PASS="${MQTT_PASSWORD:-123456}"
         mosquitto_passwd -b -c "$TMPPASS" "$MQTT_USER" "$MQTT_PASS"
         mv "$TMPPASS" "$PASSFILE"
         trap - EXIT INT TERM
